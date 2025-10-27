@@ -1,9 +1,3 @@
-## Using coqdoc
-
-```sh
-coqdoc <source_file>.v -g
-```
-
 ## Coq Makefile生成与编译
 
 要生成Makefile，可以使用以下命令：
@@ -12,16 +6,37 @@ coqdoc <source_file>.v -g
 coq_makefile -f _CoqProject *.v -o Makefile
 ```
 
-编译`Basics.vo`文件的方法有两种：
+```sh
+make
+```
 
 ```sh
-make Basics.vo
+make clean
+```
+
+```sh
+# clean *.aux and *.timing
+make cleanall 
+```
+
+编译单个文件的方法有两种：
+
+```sh
+make <rocq_file>.vo
 ```
 
 或者直接使用`coqc`命令进行编译：
 
 ```sh
-coqc -Q . LF Basics.v
+coqc -Q . LF <rocq_file>.v
+```
+
+---
+
+## Using coqdoc
+
+```sh
+coqdoc <source_file>.v -g
 ```
 
 ---

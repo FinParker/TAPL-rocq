@@ -30,12 +30,7 @@ Theorem multi_trans :
   forall (X : Type) (R : relation X X) (x y z : X),
   (multi R) x y -> (multi R) y z -> (multi R) x z.
 Proof.
-  intros X R x y z Hxy Hyz.
-  induction Hxy.
-  - exact Hyz.
-  - apply multi_step with (y := y0).
-    + exact H.
-    + apply IHHxy. exact Hyz.
+Admitted.
 
 Module Boolean.
 
