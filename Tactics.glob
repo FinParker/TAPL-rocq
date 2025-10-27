@@ -1,0 +1,6 @@
+DIGEST 3e8d549b971cf4d52db7e1cc00e5f903
+FTAPL.Tactics
+R27:32 Stdlib.Strings.String <> <> lib
+R34:37 Stdlib.Lists.List <> <> lib
+R39:42 Stdlib.Bool.Bool <> <> lib
+R44:46 Stdlib.micromega.Lia <> <> lib
