@@ -3,7 +3,7 @@
 要生成Makefile，可以使用以下命令：
 
 ```sh
-coq_makefile -f _CoqProject *.v -o Makefile
+coq_makefile -f _CoqProject -o Makefile
 ```
 
 ```sh

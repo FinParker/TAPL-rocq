@@ -13,6 +13,7 @@ Definition normal_form {X Y : Type}
 (R : relation X Y) (t : X) : Prop :=
 ~ exists t', R t t'.
 
+(* multi_step on relation *)
 Inductive multi {X: Type} (R : relation X X):relation X X :=
   | multi_refl : forall (x : X), multi R x x
   | multi_step : forall (x y z : X), R x y -> multi R y z -> multi R x z.
@@ -30,14 +31,16 @@ Theorem multi_trans :
   forall (X : Type) (R : relation X X) (x y z : X),
   (multi R) x y -> (multi R) y z -> (multi R) x z.
 Proof.
-Admitted.
+  intros X R x y z Hxy Hyz.
+  induction Hxy.
+  - exact Hyz.
+  - apply IHHxy in Hyz.
+    apply multi_step with (y := y).
+    + exact H.
+    + exact Hyz.
+Qed.
 
 Module Boolean.
-
-(* Lemma value_is_nf : forall v, value v -> normal_form step v.
-Lemma nf_is_value : forall t, normal_form step t -> value t.
-Corollary nf_same_as_value : forall t,
-normal_form step t <-> value t. *)
 
 (* Syntax *)
 Inductive bterm: Type :=
@@ -116,13 +119,13 @@ Proof.
   induction Hy1.
   - (* ST_IfTrue *) intros. inv Hy2.
     + reflexivity.
-    + inversion H3.
+    + inv H3.
   - (* ST_IfFalse *) intros. inv Hy2.
     + reflexivity.
-    + inversion H3.
+    + inv H3.
   - (* ST_If *) intros. inv Hy2. 
-    + inversion Hy1.
-    + inversion Hy1.
+    + inv Hy1.
+    + inv Hy1.
     + f_equal. apply IHHy1. exact H3.
 Qed.
 
