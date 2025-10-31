@@ -137,13 +137,15 @@ Proof.
 • constructor: 寻找一个可以匹配目标的归纳定义
 构造函数c，并执行apply c。
 
+- [`exfalso`]: There is no need to prove Goal Because there is conflict in Hypothsis, Then prove Goal equals to prove False.
+
 - [`clear H`]: Delete hypothesis [H] from the context.
 
 - [`subst x`]: Given a variable [x], find an assumption [x = e] or
 [e = x] in the context, replace [x] with [e] throughout the
 context and current goal, and clear the assumption.
 
-- [subst]: Substitute away _all_ assumptions of the form [x = e]
+- [`subst`]: Substitute away _all_ assumptions of the form [x = e]
 or [e = x] (where [x] is a variable).
 
 - [rename... into...]: Change the name of a hypothesis in the
