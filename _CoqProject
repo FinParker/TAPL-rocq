@@ -1,3 +1,5 @@
 -R . TAPL
 Tactics/Tactics.v
+Props/RelationProp.v
 UntypedArithExpr.v
+ArithExpr.v

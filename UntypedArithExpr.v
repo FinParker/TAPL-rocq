@@ -1,45 +1,7 @@
 (* v0.0.1 *)
 From Stdlib Require Import List.
 Import ListNotations.
-From TAPL Require Import Tactics.
-
-(* relation *)
-Definition relation (X Y: Type) := X -> Y -> Prop.
-
-(* deterministic on relation *)
-Definition deterministic {X Y: Type} (R: relation X Y): Prop :=
-  forall x y1 y2, R x y1 -> R x y2 -> y1 = y2.
-
-Definition normal_form {X Y : Type}
-(R : relation X Y) (t : X) : Prop :=
-~ exists t', R t t'.
-
-(* multi_step on relation *)
-Inductive multi {X: Type} (R : relation X X):relation X X :=
-  | multi_refl : forall (x : X), multi R x x
-  | multi_step : forall (x y z : X), R x y -> multi R y z -> multi R x z.
-
-Theorem multi_R : forall (X : Type) (R : relation X X) (x y : X),
-R x y -> (multi R) x y.
-Proof.
-  intros X R x y H.
-  apply multi_step with (y := y).
-  - exact H.
-  - apply multi_refl.
-Qed.
-
-Theorem multi_trans :
-  forall (X : Type) (R : relation X X) (x y z : X),
-  (multi R) x y -> (multi R) y z -> (multi R) x z.
-Proof.
-  intros X R x y z Hxy Hyz.
-  induction Hxy.
-  - exact Hyz.
-  - apply IHHxy in Hyz.
-    apply multi_step with (y := y).
-    + exact H.
-    + exact Hyz.
-Qed.
+From TAPL Require Import Tactics RelationProp.
 
 Module Boolean.
 
@@ -219,7 +181,17 @@ Proof.
     apply nf_multi_btstep with (t1 := t) (t2 := t2).
     exact Hnf1.
     exact Hmulti2.
-  - (* multi_step *)
+  - (* multi_step *) 
+    apply IHHmulti1.
+    + exact Hnf1. 
+    + inv Hmulti2.
+      * (* multi_refl *) unfold normal_form in Hnf2. exfalso. apply Hnf2. exists t0. exact H.
+      * (* multi_step *) assert(Hder: t0=t5).
+        { eapply btstep_deterministic. 
+          - exact H.
+          - exact H0. }
+        subst. assumption.
+Qed.
 
 Lemma multi_btstep_If : forall t1 t1' t2 t3,
 t1 -->* t1' ->
@@ -270,68 +242,7 @@ Proof.
     + (* t1' = BTTrue *) eexists. split.
 Admitted.
       
-
 End Boolean.
-
-Inductive constant: Type:=
-  | CTrue 
-  | CFalse 
-  | CZero.
-
-Inductive term: Type:=
-  | TTrue 
-  | TFalse 
-  | TIf (t1: term) (t2: term) (t3: term)
-  | TZero
-  | TSucc (t: term)
-  | TPred (t: term)
-  | TIsZero (t: term).
-
-Fixpoint Consts (t: term): list constant :=
-  match t with
-  | TTrue => [CTrue]
-  | TFalse => [CFalse]
-  | TIf t1 t2 t3 => Consts t1 ++ Consts t2 ++ Consts t3
-  | TZero => [CZero]
-  | TSucc t1 => Consts t1
-  | TPred t1 => Consts t1
-  | TIsZero t1 => Consts t1
-  end.
-
-Example test_Consts:
-  Consts (TIf TTrue (TSucc TZero) (TPred (TSucc TZero)))
-  = [CTrue; CZero; CZero].
-Proof. reflexivity. Qed.
-
-Fixpoint teval (t: term): term :=
-  match t with
-  | TTrue => TTrue
-  | TFalse => TFalse
-  | TIf t1 t2 t3 =>
-      match teval t1 with
-      | TTrue => teval t2
-      | TFalse => teval t3
-      | _ => TIf (teval t1) (teval t2) (teval t3)
-      end
-  | TZero => TZero
-  | TSucc t1 => TSucc (teval t1)
-  | TPred t1 =>
-      match teval t1 with
-      | TZero => TZero
-      | TSucc nv1 => nv1
-      | _ => TPred (teval t1)
-      end
-  | TIsZero t1 =>
-      match teval t1 with
-      | TZero => TTrue
-      | TSucc nv1 => TFalse
-      | _ => TIsZero (teval t1)
-      end
-  end.
-
-Example test_teval1:
-  teval (TIf TTrue (TSucc TZero) (TPred (TSucc TZero))) = TSucc TZero.
-Proof. reflexivity. Qed.
 
 
 
