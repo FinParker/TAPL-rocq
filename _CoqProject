@@ -1,7 +1,7 @@
 -Q . TAPL
 
+src/UntypedArithExpr.v
+src/ArithExpr.v
 plf/Maps.v
 Tactics/Tactics.v
 Props/RelationProp.v
-UntypedArithExpr.v
-ArithExpr.v

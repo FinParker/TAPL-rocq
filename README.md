@@ -4,39 +4,36 @@
 
 ## How to build this project
 
-(0) Just run the `./run_make.sh`
+(A) Just run the `./run_make.sh`
 
 ```sh
 ./run_make.sh
 ```
 
-OR
+Or
 
-(1) Run this command to generate Makefile.
+(B-1) Run this command to generate Makefile.
 
 ```sh
 coq_makefile -f _CoqProject -o Makefile
 ```
 
-(2) Make
+(B-2) Make
 ```sh
 make
 ```
 
-(3) Make clean
+(B-3) Make clean
 
 ```sh
 make clean
 make cleanall  # clean *.aux and *.timing
 ```
 
-(4) Compile single file
+(B-4) Compile single file
 
 ```sh
-make <rocq_file>.vo
-```
-Or,
-
-```sh
+make <rocq_file>.vo  
+# or
 coqc -Q . LF <rocq_file>.v
 ```
