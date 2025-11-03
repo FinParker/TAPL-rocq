@@ -171,81 +171,33 @@ Proof.
       * (* E_IfTrue *) apply B_IfTrue. 
 Admitted.
 
-Lemma nf_multi_btstep :
+Lemma nf_multi_step :
   forall t1 t2,
-  normal_form btstep t1 ->
+  normal_form step t1 ->
   t1 -->* t2 ->
   t1 = t2.
 Proof.
   intros t1 t2 Hnf Hmulti.
   induction Hmulti.
   - (* multi_refl *) reflexivity.
-  - (* multi_step *) unfold normal_form in Hnf. exfalso. apply Hnf. exists t2. exact H.
+  - (* multi_step *) unfold normal_form in Hnf. exfalso. apply Hnf. exists y. exact H.
 Qed.
 
 Theorem unique_normal_forms :
   forall t t1 t2,
   t -->* t1 ->
-  normal_form btstep t1 ->
+  normal_form step t1 ->
   t -->* t2 ->
-  normal_form btstep t2 ->
+  normal_form step t2 ->
   t1 = t2.
 Proof.
   intros t t1 t2 Hmulti1 Hnf1 Hmulti2 Hnf2.
   induction Hmulti1.
   - (* multi_refl *)
-    apply nf_multi_btstep with (t1 := t) (t2 := t2).
+    apply nf_multi_step with (t1 := x) (t2 := t2).
     exact Hnf1.
     exact Hmulti2.
   - (* multi_step *)
-
-Lemma multi_btstep_If : forall t1 t1' t2 t3,
-t1 -->* t1' ->
-BTIf t1 t2 t3 -->* BTIf t1' t2 t3.
-Proof.
-  intros t1 t1' t2 t3 Hmulti.
-  induction Hmulti. 
-  - (* multi_refl *)
-    apply multi_refl.
-  - (* multi_step *)
-    eapply multi_step.
-    eapply ST_If. exact H. exact IHHmulti.
-Qed.
-
-Example btstep_If_true_normalizing : forall t1 t2 t3, exists t', (t1 -->* BTTrue) -> (BTIf t1 t2 t3) -->* t'.
-Proof.
-  intros t1 t2 t3. eexists.
-  apply multi_btstep_If.
-Qed.
-
-Example btstep_If_false_normalizing : forall t1 t2 t3, exists t', (t1 -->* BTFalse) -> (BTIf t1 t2 t3) -->* t'.
-Proof.
-  intros t1 t2 t3. eexists.
-  apply multi_btstep_If.
-Qed.
-
-Theorem btstep_normarlizing:
-  forall t: bterm, exists t',
-  (t -->* t') /\ normal_form btstep t'.
-Proof.
-  intros t.
-  induction t.
-  - exists BTTrue. split.
-    + apply multi_refl.
-    + unfold normal_form. intros [t' Hstep]. inv Hstep.
-  - exists BTFalse. split.
-    + apply multi_refl.
-    + unfold normal_form. intros [t' Hstep]. inv Hstep.
-  - destruct IHt1 as [t1' [Hmulti1 Hnf1]].
-    destruct IHt2 as [t2' [Hmulti2 Hnf2]].
-    destruct IHt3 as [t3' [Hmulti3 Hnf3]].
-    destruct (nf_same_as_value t1') as [Hval1 _].
-    destruct (nf_same_as_value t2') as [Hval2 _].
-    destruct (nf_same_as_value t3') as [Hval3 _].
-    apply Hval1 in Hnf1. apply Hval2 in Hnf2. apply Hval3 in Hnf3.
-    clear Hval1 Hval2 Hval3.
-    inv Hnf1; inv Hnf2; inv Hnf3.
-    + (* t1' = BTTrue *) eexists. split.
 Admitted.
 
 End NumberBoolean.

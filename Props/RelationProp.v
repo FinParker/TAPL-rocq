@@ -35,3 +35,13 @@ Proof.
     + exact H.
     + exact Hyz.
 Qed.
+
+Theorem R_is_multiR:
+  forall (X : Type) (R : relation X X) (x y : X),
+  R x y -> (multi R) x y.
+Proof.
+  intros X R x y H.
+  apply multi_step with (y := y).
+  - exact H.
+  - apply multi_refl.
+Qed.

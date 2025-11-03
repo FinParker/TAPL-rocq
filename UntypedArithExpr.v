@@ -1,7 +1,8 @@
 (* v0.0.1 *)
 From Stdlib Require Import List.
 Import ListNotations.
-From TAPL Require Import Tactics RelationProp.
+From TAPL.Tactics Require Import Tactics.
+From TAPL.Props Require Import RelationProp.
 
 Module Boolean.
 
@@ -137,11 +138,25 @@ Inductive multi_btstep: bterm -> bterm -> Prop :=
       (multi_btstep t2 t3) ->
       (multi_btstep t1 t3).
 
-Check multi_btstep_ind.
-
 Definition multi_btstep' := multi btstep.
 
 Notation "t '-->*' n" := (multi_btstep t n) (at level 90, left associativity).
+
+Lemma multi_btstep_trans :
+  forall t1 t2 t3,
+  t1 -->* t2 ->
+  t2 -->* t3 ->
+  t1 -->* t3.
+Proof.
+  intros t1 t2 t3 Hmulti1 Hmulti2.
+  induction Hmulti1.
+  - (* multi_refl *)
+    apply Hmulti2.
+  - (* multi_step *)
+    apply multi_step with (t2 := t2).
+    + exact H.
+    + apply IHHmulti1. exact Hmulti2.
+Qed.
 
 Example test_multi_btstep:
   BTIf (BTIf BTTrue BTFalse BTTrue) BTTrue BTFalse -->* BTFalse.
@@ -193,6 +208,17 @@ Proof.
         subst. assumption.
 Qed.
 
+Lemma step_is_multi_step :
+  forall t1 t2,
+  t1 --> t2 ->
+  t1 -->* t2.
+Proof.
+  intros t1 t2 Hstep.
+  apply multi_step with (t2 := t2).
+  - exact Hstep.
+  - apply multi_refl.
+Qed.
+
 Lemma multi_btstep_If : forall t1 t1' t2 t3,
 t1 -->* t1' ->
 BTIf t1 t2 t3 -->* BTIf t1' t2 t3.
@@ -206,16 +232,28 @@ Proof.
     eapply ST_If. exact H. exact IHHmulti.
 Qed.
 
-Example btstep_If_true_normalizing : forall t1 t2 t3, exists t', (t1 -->* BTTrue) -> (BTIf t1 t2 t3) -->* t'.
+Lemma btstep_If_true_normalizing : forall (t1 t2 t3: bterm), (t1 -->* BTTrue) -> (BTIf t1 t2 t3) -->* t2.
 Proof.
-  intros t1 t2 t3. eexists.
-  apply multi_btstep_If.
+  intros t1 t2 t3 Hmulti.
+  assert (Hstep: BTIf t1 t2 t3 -->* BTIf BTTrue t2 t3).
+  { apply multi_btstep_If. exact Hmulti. }
+  assert (Hfinal: BTIf BTTrue t2 t3 -->* t2).
+  { apply step_is_multi_step. apply ST_IfTrue. }
+  apply multi_btstep_trans with (t2 := BTIf BTTrue t2 t3).
+  - exact Hstep.
+  - exact Hfinal.
 Qed.
 
-Example btstep_If_false_normalizing : forall t1 t2 t3, exists t', (t1 -->* BTFalse) -> (BTIf t1 t2 t3) -->* t'.
+Example btstep_If_false_normalizing : forall (t1 t2 t3: bterm), (t1 -->* BTFalse) -> (BTIf t1 t2 t3) -->* t3.
 Proof.
-  intros t1 t2 t3. eexists.
-  apply multi_btstep_If.
+  intros t1 t2 t3 Hmulti.
+  assert (Hstep: BTIf t1 t2 t3 -->* BTIf BTFalse t2 t3).
+  { apply multi_btstep_If. exact Hmulti. }
+  assert (Hfinal: BTIf BTFalse t2 t3 -->* t3).
+  { apply step_is_multi_step. apply ST_IfFalse. }
+  apply multi_btstep_trans with (t2 := BTIf BTFalse t2 t3).
+  - exact Hstep.
+  - exact Hfinal.
 Qed.
 
 Theorem btstep_normarlizing:
@@ -239,7 +277,6 @@ Proof.
     apply Hval1 in Hnf1. apply Hval2 in Hnf2. apply Hval3 in Hnf3.
     clear Hval1 Hval2 Hval3.
     inv Hnf1; inv Hnf2; inv Hnf3.
-    + (* t1' = BTTrue *) eexists. split.
 Admitted.
       
 End Boolean.

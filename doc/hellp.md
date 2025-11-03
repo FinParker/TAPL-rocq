@@ -41,6 +41,22 @@ coqc -Q . LF <rocq_file>.v
 
 ---
 
+## Using Setoid
+
+```coq
+(** ** Setoids and Logical Equivalence *)
+
+(** Some of Coq's tactics treat [iff] statements specially, avoiding some
+    low-level proof-state manipulation.  In particular, [rewrite] and
+    [reflexivity] can be used with [iff] statements, not just equalities.
+    To enable this behavior, we have to import the Coq library that
+    supports it: *)
+
+From Stdlib Require Import Setoids.Setoid.
+```
+
+---
+
 ## Using coqdoc
 
 ```sh
@@ -134,6 +150,10 @@ Proof.
 ```
 
 ## Tactics
+
+- Implication: A->B
+  - [`intros`] implication in Goal
+  - [`apply`] implication in Hypothesis
 
 • clear H: 删除假设H
 • subst x: 如果存在x=e或者e=x的假设，则删除该
@@ -238,6 +258,10 @@ like [apply c].
   - rewrite (<-)(->) H. 可以标识替换方向
   - H应当是一个等式或者P->Q(Q是等式)
   - 匹配结论中出现的结构, 把H的某一边替换为另一边
+  - 实际上rewrite可以用到任意等价关系上
+    • setoid：带等价关系的集合
+    • =是类型X上的等价关系
+    • <->是Prop上的等价关系
 
 - [`repeat`](#repeat)
 

@@ -2,7 +2,15 @@
 
 [Make Sure you have rocq-prover at least 9.0.0](https://rocq-prover.org/docs/using-opam)
 
-## Coq Makefile生成与编译
+## How to build this project
+
+(0) Just run the `./run_make.sh`
+
+```sh
+./run_make.sh
+```
+
+OR
 
 (1) Run this command to generate Makefile.
 
