@@ -1,5 +1,8 @@
--Q . TAPL
+# TAPL Rocq Project Configuration
+# Using -R for the project root to allow flexible module loading
+-R . TAPL
 
+# Source files
 src/UntypedArithExpr.v
 src/ArithExpr.v
 plf/Maps.v

@@ -1,0 +1,20 @@
+# CoqMakefile.local
+# This file can be used to extend CoqMakefile with custom rules
+
+# Example: Add pre-build checks
+pre-all::
+	@echo "Starting build of TAPL Rocq project..."
+
+# Example: Add post-build actions
+post-all::
+	@echo "Build completed!"
+	@echo "Generated files:"
+	@find . -name "*.vo" -type f
+
+# Example: Add custom clean actions
+# clean::
+# 	@echo "Cleaning custom files..."
+
+# Example: Add custom install actions
+# install-extra::
+# 	@echo "Installing additional files..."
