@@ -3,14 +3,14 @@
 Set Warnings "-notation-overridden,-parsing,-deprecated-hint-without-locality".
 Set Warnings "-intuition-auto-with-star".
 From Stdlib Require Import Strings.String.
-From TAPL.plf Require Import Maps.
+From PLF Require Import Maps.
 From Stdlib Require Import Bool.
 From Stdlib Require Import Arith.
 From Stdlib Require Import EqNat.
 From Stdlib Require Import PeanoNat. Import Nat.
 From Stdlib Require Import Lia.
-From TAPL.plf Require Export Imp.
-From TAPL.plf Require Import Hoare.
+From PLF Require Export Imp.
+From PLF Require Import Hoare.
 Set Default Goal Selector "!".
 
 Definition FILL_IN_HERE := <{True}>.

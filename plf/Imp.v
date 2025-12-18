@@ -29,7 +29,7 @@ From Stdlib Require Import EqNat. Import Nat.
 From Stdlib Require Import Lia.
 From Stdlib Require Import List. Import ListNotations.
 From Stdlib Require Import Strings.String.
-From TAPL.plf Require Import Maps.
+From PLF Require Import Maps.
 Set Default Goal Selector "!".
 
 (* ################################################################# *)
@@ -422,14 +422,10 @@ Qed.
 
 Theorem In10' : In 10 [1;2;3;4;5;6;7;8;9;10].
 Proof.
-  simpl.
   repeat simpl.
   repeat (left; reflexivity).
   repeat (right; try (left; reflexivity)).
 Qed.
-
-(* Print total_map. *)
-(* Check total_map nat. *)
 
 (** The tactic [repeat T] does not have any upper bound on the
     number of times it applies [T].  If [T] is a tactic that _always_
@@ -467,53 +463,23 @@ Admitted.
     it is sound.  Use the tacticals we've just seen to make the proof
     as short and elegant as possible. *)
 
-(* Inductive bexp : Type :=
-  | BTrue
-  | BFalse
-  | BEq (a1 a2 : aexp)
-  | BNeq (a1 a2 : aexp)
-  | BLe (a1 a2 : aexp)
-  | BGt (a1 a2 : aexp)
-  | BNot (b : bexp)
-  | BAnd (b1 b2 : bexp). *)
-
-Fixpoint optimize_0plus_b (b : bexp) : bexp :=
-    match b with
-    | BTrue => BTrue
-    | BFalse => BFalse
-    | BEq a1 a2 => BEq (optimize_0plus a1) (optimize_0plus a2)
-    | BNeq a1 a2 => BNeq (optimize_0plus a1) (optimize_0plus a2)
-    | BLe a1 a2 => BLe (optimize_0plus a1) (optimize_0plus a2)
-    | BGt a1 a2 => BGt (optimize_0plus a1) (optimize_0plus a2)
-    | BNot b' => BNot (optimize_0plus_b b')
-    | BAnd b1 b2 => BAnd (optimize_0plus_b b1) (optimize_0plus_b b2)
-    end.
+Fixpoint optimize_0plus_b (b : bexp) : bexp
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
 
 Example optimize_0plus_b_test1:
   optimize_0plus_b (BNot (BGt (APlus (ANum 0) (ANum 4)) (ANum 8))) =
                    (BNot (BGt (ANum 4) (ANum 8))).
-Proof. reflexivity. (* FILL IN HERE *) Qed.
+Proof. (* FILL IN HERE *) Admitted.
 
 Example optimize_0plus_b_test2:
   optimize_0plus_b (BAnd (BLe (APlus (ANum 0) (ANum 4)) (ANum 5)) BTrue) =
                    (BAnd (BLe (ANum 4) (ANum 5)) BTrue).
-Proof. reflexivity. Qed. (* FILL IN HERE *)
+Proof. (* FILL IN HERE *) Admitted.
 
 Theorem optimize_0plus_b_sound : forall b,
-    beval (optimize_0plus_b b) = beval b.
+  beval (optimize_0plus_b b) = beval b.
 Proof.
-    intros b.
-    induction b.
-    - simpl. reflexivity.
-    - simpl. reflexivity.
-    - simpl. repeat (rewrite optimize_0plus_sound). reflexivity.
-    - simpl. repeat (rewrite optimize_0plus_sound). reflexivity.
-    - simpl. repeat (rewrite optimize_0plus_sound). reflexivity.
-    - simpl. repeat (rewrite optimize_0plus_sound). reflexivity.
-    - simpl. rewrite IHb. reflexivity.
-    - simpl. rewrite IHb1, IHb2. reflexivity.
-Qed.
-
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 (** **** Exercise: 4 stars, standard, optional (optimize)
@@ -1191,11 +1157,8 @@ Fixpoint beval (st : state) (* <--- NEW *)
 
 (** We can use our notation for total maps in the specific case of
     states -- i.e., we write the empty state as [(_ !-> 0)]. *)
-Notation "'_' '!->' v" := (t_empty v)
-  (at level 100, right associativity).
-Definition empty_st := (_ !-> 0).
 
-Notation "x '!->' v ';' m" := (t_update m x v) (at level 100, x constr, right associativity).
+Definition empty_st := (_ !-> 0).
 
 (** Also, we can add a notation for a "singleton state" with just one
     variable bound to a value. *)
@@ -1279,7 +1242,7 @@ Definition fact_in_coq : com :=
        Z := Z - 1
      end }>.
 
-(* Print fact_in_coq. *)
+Print fact_in_coq.
 
 (* ================================================================= *)
 (** ** Desugaring Notations *)
@@ -1300,7 +1263,7 @@ Definition fact_in_coq : com :=
     elaborate the current goal and context. *)
 
 Unset Printing Notations.
-(* Print fact_in_coq. *)
+Print fact_in_coq.
 (* ===>
    fact_in_coq =
    CSeq (CAsgn Z X)
@@ -1311,14 +1274,14 @@ Unset Printing Notations.
         : com *)
 Set Printing Notations.
 
-(* Print example_bexp. *)
+Print example_bexp.
 (* ===> example_bexp = <{(true && ~ (X <= 4))}> *)
 
 Set Printing Coercions.
-(* Print example_bexp. *)
+Print example_bexp.
 (* ===> example_bexp = <{(true && ~ (AId X <= ANum 4))}> *)
 
-(* Print fact_in_coq. *)
+Print fact_in_coq.
 (* ===>
   fact_in_coq =
   <{ Z := (AId X);
@@ -1339,7 +1302,7 @@ Unset Printing Coercions.
 (** When used with an identifier, the [Locate] prints the full path to
     every value in scope with the same name.  This is useful to
     troubleshoot problems due to variable shadowing. *)
-(* Locate aexp. *)
+Locate aexp.
 (* ===>
      Inductive LF.Imp.aexp
      Inductive LF.Imp.AExp.aexp
@@ -1355,13 +1318,13 @@ Unset Printing Coercions.
 (** When faced with an unknown notation, you can use [Locate] with a
     string containing one of its symbols to see its possible
     interpretations. *)
-(* Locate "&&". *)
+Locate "&&".
 (* ===>
     Notation
       "x && y" := BAnd x y (default interpretation)
       "x && y" := andb x y : bool_scope (default interpretation)
 *)
-(* Locate ";". *)
+Locate ";".
 (* ===>
     Notation
       "x '|->' v ';' m" := update m x v (default interpretation)
@@ -1370,7 +1333,7 @@ Unset Printing Coercions.
       "[ x ; y ; .. ; z ]" := cons x (cons y .. (cons z nil) ..) : list_scope
       (default interpretation) *)
 
-(* Locate "while". *)
+Locate "while".
 (* ===>
     Notation
       "'while' x 'do' y 'end'" :=
@@ -1610,7 +1573,7 @@ Proof.
 (** [] *)
 
 Set Printing Implicit.
-(* Check @ceval_example2. *)
+Check @ceval_example2.
 
 (** **** Exercise: 3 stars, standard, optional (pup_to_n)
 
@@ -1840,7 +1803,7 @@ Fixpoint s_execute (st : state) (stack : list nat)
                  : list nat
   (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
 
-(* Check s_execute. *)
+Check s_execute.
 
 Example s_execute1 :
      s_execute empty_st []

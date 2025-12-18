@@ -1,27 +1,29 @@
 {
-  // VsRocq Extension Configuration
+  // VsRocq Extension Configuration (rocq-prover.vsrocq)
   "vsrocq.path": "/home/zsj/.opam/rocq-9.0.0/bin/vsrocqtop",
-  "vsrocq.args": [],
-  // Automatically detect _CoqProject file
-  "vsrocq.proof.mode": 0,
-  // Use _CoqProject for configuration
-  "vsrocq.autoCompile": true,
-  // File associations
+  "vsrocq.args": [
+    "-R",
+    ".",
+    "TAPL"
+  ],
+  // File associations - CRITICAL
   "files.associations": {
-    "*.v": "rocq",
-    "_CoqProject": "plaintext"
+    "*.v": "rocq"
   },
-  // Enable trace for debugging (can be set to "verbose" for more details)
+  // Enable verbose logging for debugging
   "vsrocq.trace.server": "verbose",
-  // Workspace root
+  "vsrocq.trace.client": "verbose",
+  // Workspace settings
   "vsrocq.proof.workspaceRoot": "${workspaceFolder}",
-  // Additional settings for better integration
-  "vsrocq.proof.cursor.sticky": true,
-  "vsrocq.proof.delegation": "Skip",
+  // Auto compile with _CoqProject
+  "vsrocq.autoCompile": true,
+  // Connection settings - ensure connection persists
+  "vsrocq.check.mode": "async",
+  "vsrocq.proof.delay": 500,
   // Editor settings for .v files
   "[rocq]": {
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
     "editor.formatOnSave": false
-  }
+  },
 }

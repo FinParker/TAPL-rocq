@@ -1,8 +1,7 @@
 (** * Equiv: Program Equivalence *)
- 
-Set Warnings "-notation-overridden,-parsing,-deprecated-hint-without-locality".
 
-From TAPL.plf Require Import Maps.
+Set Warnings "-notation-overridden,-parsing,-deprecated-hint-without-locality".
+From PLF Require Import Maps.
 From Stdlib Require Import Bool.
 From Stdlib Require Import Arith.
 From Stdlib Require Import Init.Nat.
@@ -11,7 +10,7 @@ From Stdlib Require Import EqNat.
 From Stdlib Require Import Lia.
 From Stdlib Require Import List. Import ListNotations.
 From Stdlib Require Import FunctionalExtensionality.
-From TAPL.plf Require Export Imp.
+From PLF Require Export Imp.
 Set Default Goal Selector "!".
 
 (** *** Before You Get Started:

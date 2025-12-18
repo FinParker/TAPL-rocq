@@ -6,7 +6,7 @@ From Stdlib Require Import EqNat. Import Nat.
 From Stdlib Require Import Lia.
 From Stdlib Require Import List. Import ListNotations.
 From Stdlib Require Import Strings.String.
-From TAPL.plf Require Import Maps.
+From PLF Require Import Maps.
 Set Default Goal Selector "!".
 (* ================================================================= *)
 (** ** States *)

@@ -12,15 +12,25 @@
 
 Set Warnings "-notation-overridden,-parsing,-deprecated-hint-without-locality".
 From Stdlib Require Import Arith.
-From TAPL.plf Require Import Maps.
-From TAPL.Props Require Import RelationProp.
-From TAPL.Tactics Require Import Tactics.
+From PLF Require Import Maps.
+From PLF Require Import Smallstep.
 Set Default Goal Selector "!".
 
 Hint Constructors multi : core.
 
 (* ################################################################# *)
 (** * Typed Arithmetic Expressions *)
+
+(** To motivate the discussion of type systems, let's begin as
+    usual with a tiny toy language.  We want it to have the potential
+    for programs to go wrong because of runtime type errors, so we
+    need something a tiny bit more complex than the language of
+    constants and addition that we used in chapter [Smallstep]: a
+    single kind of data (e.g., numbers) is too simple, but just two
+    kinds (numbers and booleans) gives us enough material to tell an
+    interesting story.
+
+    The language definition is completely routine. *)
 
 (* ================================================================= *)
 (** ** Syntax *)
@@ -67,8 +77,6 @@ Notation "'if' c 'then' t 'else' e" := (ite c t e)
 Local Open Scope tm_scope.
 
 (** _Values_ are [true], [false], and numeric values... *)
-(* Check true.
-Check <{true}>. *)
 Inductive bvalue : tm -> Prop :=
   | bv_true : bvalue <{ true }>
   | bv_false : bvalue <{ false }>.
@@ -84,6 +92,47 @@ Hint Unfold value : core.
 
 (* ================================================================= *)
 (** ** Operational Semantics *)
+
+(** Here is the single-step relation, first informally...
+
+                   -------------------------------                   (ST_IfTrue)
+                   if true then t1 else t2 --> t1
+
+                   -------------------------------                  (ST_IfFalse)
+                   if false then t1 else t2 --> t2
+
+                               t1 --> t1'
+            ------------------------------------------------             (ST_If)
+            if t1 then t2 else t3 --> if t1' then t2 else t3
+
+                             t1 --> t1'
+                         --------------------                          (ST_Succ)
+                         succ t1 --> succ t1'
+
+                           ------------                               (ST_Pred0)
+                           pred 0 --> 0
+
+                         numeric value v
+                        -------------------                        (ST_PredSucc)
+                        pred (succ v) --> v
+
+                              t1 --> t1'
+                         --------------------                          (ST_Pred)
+                         pred t1 --> pred t1'
+
+                          -----------------                         (ST_IsZero0)
+                          iszero 0 --> true
+
+                         numeric value v
+                      -------------------------                  (ST_IsZeroSucc)
+                      iszero (succ v) --> false
+
+                            t1 --> t1'
+                       ------------------------                      (ST_IsZero)
+                       iszero t1 --> iszero t1'
+*)
+
+(** ... and then formally: *)
 
 Reserved Notation "t '-->' t'" (at level 40).
 
@@ -119,6 +168,16 @@ where "t '-->' t'" := (step t t').
 
 Hint Constructors step : core.
 
+(** Notice that the [step] relation doesn't care about whether the
+    expression being stepped makes global sense -- it just checks that
+    the operation in the _next_ reduction step is being applied to the
+    right kinds of operands.  For example, the term [succ true] cannot
+    take a step, but the almost as obviously nonsensical term
+
+       succ (if true then true else true)
+
+    can take a step (once, before becoming stuck). *)
+
 (* ================================================================= *)
 (** ** Normal Forms and Values *)
 
@@ -141,13 +200,7 @@ Hint Unfold stuck : core.
 Example some_term_is_stuck :
   exists t, stuck t.
 Proof.
-  exists <{ pred true }>. split.
-  - unfold step_normal_form. intros [t' Hstep].
-    inv Hstep. inv H0.
-  - unfold not. intros [Hbv | Hnv].
-    + inv Hbv.
-    + inv Hnv.
-Qed.
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 (** However, although values and normal forms are _not_ the same in this
@@ -197,6 +250,39 @@ Inductive ty : Type :=
   | Bool : ty
   | Nat : ty.
 
+(** In informal notation, the typing relation is often written
+    [|-- t \in T] and pronounced "[t] has type [T]."  The [|--] symbol
+    is called a "turnstile."  Below, we're going to see richer typing
+    relations where one or more additional "context" arguments are
+    written to the left of the turnstile.  For the moment, the context
+    is always empty.
+
+                           -----------------                   (T_True)
+                           |-- true \in Bool
+
+                          ------------------                   (T_False)
+                          |-- false \in Bool
+
+           |-- t1 \in Bool    |-- t2 \in T    |-- t3 \in T
+           -----------------------------------------------     (T_If)
+                   |-- if t1 then t2 else t3 \in T
+
+                             --------------                    (T_0)
+                             |-- 0 \in Nat
+
+                            |-- t1 \in Nat
+                          -------------------                  (T_Succ)
+                          |-- succ t1 \in Nat
+
+                            |-- t1 \in Nat
+                          -------------------                  (T_Pred)
+                          |-- pred t1 \in Nat
+
+                            |-- t1 \in Nat
+                          ----------------------               (T_IsZero)
+                          |-- iszero t1 \in Bool
+*)
+
 Declare Custom Entry ty.
 Notation "'Nat'" := Nat (in custom ty).
 Notation "'Bool'" := Bool (in custom ty).
@@ -234,12 +320,15 @@ Hint Constructors has_type : core.
 Example has_type_1 :
   <{ |-- if false then 0 else (succ 0) \in Nat }>.
 Proof.
-  (* This can be used only by auto *)
   apply T_If.
   - apply T_False.
   - apply T_0.
   - apply T_Succ. apply T_0.
 Qed.
+
+(** (Since we've included all the constructors of the typing relation
+    in the hint database, the [auto] tactic can actually find this
+    proof automatically.) *)
 
 (** It's important to realize that the typing relation is a
     _conservative_ (or _static_) approximation: it does not consider
@@ -256,10 +345,7 @@ Example succ_hastype_nat__hastype_nat : forall t,
   <{ |--  succ t \in Nat }> ->
   <{ |-- t \in Nat }>.
 Proof.
-  intros.
-  inv H.
-  assumption.
-Qed.
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 (* ----------------------------------------------------------------- *)
@@ -320,34 +406,38 @@ Proof.
     + (* t1 can take a step *)
       destruct H as [t1' H1].
       exists <{ if t1' then t2 else t3 }>. auto.
-  - (* T_Zero *)
-    destruct IHHT.
-    + (* t is a value *)
-      apply (nat_canonical t1 HT) in H. left.
-      right. auto.
-    + destruct H as [t' H'].
-      right.
-      exists <{ succ t' }>. auto.
-  - (* T_Pred *)
-    destruct IHHT as [Hval | Hstep].
-    + (* t1 is a value *)
-      apply (nat_canonical t1 HT) in Hval. inv Hval. 
-      * right. exists <{ 0 }>. auto.
-      * right. exists t. auto.
-    + (* t1 can take a step *)
-      destruct Hstep as [t1' Hstep'].
-      right. 
-      exists <{ pred t1' }>. auto.
-  - (* T_Iszero *)
-    destruct IHHT as [Hval | Hstep].
-    + (* t1 is a value *)
-      apply (nat_canonical t1 HT) in Hval. inv Hval.
-      * right. exists <{ true }>. auto.
-      * right. exists <{ false }>. auto.
-    + (* t1 can take a step *)
-      destruct Hstep as [t1' Hstep'].
-      right. exists <{ iszero t1' }>. auto.
-Qed.
+  (* FILL IN HERE *) Admitted.
+(** [] *)
+
+(** **** Exercise: 3 stars, advanced (finish_progress_informal)
+
+    Complete the corresponding informal proof: *)
+
+(** _Theorem_: If [|-- t \in T], then either [t] is a value or else
+    [t --> t'] for some [t']. *)
+
+(** _Proof_: By induction on a derivation of [|-- t \in T].
+
+    - If the last rule in the derivation is [T_If], then [t = if t1
+      then t2 else t3], with [|-- t1 \in Bool], [|-- t2 \in T] and [|-- t3
+      \in T].  By the IH, either [t1] is a value or else [t1] can step
+      to some [t1'].
+
+      - If [t1] is a value, then by the canonical forms lemmas
+        and the fact that [|-- t1 \in Bool] we have that [t1]
+        is a [bvalue] -- i.e., it is either [true] or [false].
+        If [t1 = true], then [t] steps to [t2] by [ST_IfTrue],
+        while if [t1 = false], then [t] steps to [t3] by
+        [ST_IfFalse].  Either way, [t] can step, which is what
+        we wanted to show.
+
+      - If [t1] itself can take a step, then, by [ST_If], so can
+        [t].
+
+    - (* FILL IN HERE *)
+ *)
+(* Do not modify the following line: *)
+Definition manual_grade_for_finish_progress_informal : option (nat*string) := None.
 (** [] *)
 
 (** This theorem is more interesting than the strong progress theorem
@@ -374,23 +464,52 @@ Theorem preservation : forall t t' T,
 Proof.
   intros t t' T HT HE.
   generalize dependent t'.
-  induction HT;(* every case needs to introduce a couple of things *)intros t' HE;(* and we can deal with several impossible cases all at once *)try solve_by_invert.
-    - (* T_If *) inv HE.
+  induction HT;
+         (* every case needs to introduce a couple of things *)
+         intros t' HE;
+         (* and we can deal with several impossible
+            cases all at once *)
+         try solve_by_invert.
+    - (* T_If *) inversion HE; subst; clear HE.
       + (* ST_IFTrue *) assumption.
       + (* ST_IfFalse *) assumption.
       + (* ST_If *) apply T_If; try assumption.
         apply IHHT1; assumption.
-    - (* T_Succ *) inv HE.
-      apply T_Succ. apply IHHT; assumption.
-    - (* T_Pred *) inversion HE; subst; clear HE.
-      + (* ST_Pred0 *) apply T_0.
-      + (* ST_PredSucc *) inv HT. assumption.
-      + (* ST_Pred *) apply T_Pred. apply IHHT; assumption.
-    - (* T_Iszero *) inv HE.
-      + (* ST_IsZero0 *) apply T_True.
-      + (* ST_IsZeroSucc *) inv HT. apply T_False.
-      + (* ST_IsZero *) apply T_Iszero. apply IHHT; assumption.
-Qed.
+    (* FILL IN HERE *) Admitted.
+(** [] *)
+
+(** **** Exercise: 3 stars, advanced (finish_preservation_informal)
+
+    Complete the following informal proof: *)
+
+(** _Theorem_: If [|-- t \in T] and [t --> t'], then [|-- t' \in T]. *)
+
+(** _Proof_: By induction on a derivation of [|-- t \in T].
+
+    - If the last rule in the derivation is [T_If], then [t = if t1
+      then t2 else t3], with [|-- t1 \in Bool], [|-- t2 \in T] and [|-- t3
+      \in T].
+
+      Inspecting the rules for the small-step reduction relation and
+      remembering that [t] has the form [if ...], we see that the
+      only ones that could have been used to prove [t --> t'] are
+      [ST_IfTrue], [ST_IfFalse], or [ST_If].
+
+      - If the last rule was [ST_IfTrue], then [t' = t2].  But we
+        know that [|-- t2 \in T], so we are done.
+
+      - If the last rule was [ST_IfFalse], then [t' = t3].  But we
+        know that [|-- t3 \in T], so we are done.
+
+      - If the last rule was [ST_If], then [t' = if t1' then t2
+        else t3], where [t1 --> t1'].  We know [|-- t1 \in Bool] so,
+        by the IH, [|-- t1' \in Bool].  The [T_If] rule then gives us
+        [|-- if t1' then t2 else t3 \in T], as required.
+
+    - (* FILL IN HERE *)
+*)
+(* Do not modify the following line: *)
+Definition manual_grade_for_finish_preservation_informal : option (nat*string) := None.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard (preservation_alternate_proof)
@@ -430,11 +549,11 @@ Corollary soundness : forall t t' T,
   t -->* t' ->
   ~(stuck t').
 Proof.
-  intros t t' T HT P. induction P; intros [R S]. (* From definition of stuck *)
+  intros t t' T HT P. induction P; intros [R S].
   - apply progress in HT. destruct HT; auto.
   - apply IHP.
     + apply preservation with (t := x); auto.
-    + auto.
+    + unfold stuck. split; auto.
 Qed.
 
 (* ================================================================= *)

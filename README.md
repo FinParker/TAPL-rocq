@@ -14,19 +14,16 @@ opam repo add rocq-released https://rocq-prover.org/opam/released
 opam pin add rocq-prover 9.0.0
 ```
 
+Recommand to use VsRocq Extension.
+(Please use rocq-language-server 2.3.3 or later)
+
 ## Setup
 
 Ensure Rocq environment is loaded:
 
 ```sh
-eval $(opam env)
+eval $(opam env) # Very Important!!
 rocq --version  # Verify installation
-```
-
-## VsRocq
-
-```sh
-opam install vsrocq-language-server
 ```
 
 ## Building the Project

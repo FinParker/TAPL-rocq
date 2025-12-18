@@ -1,10 +1,38 @@
 # TAPL Rocq Project Configuration
-# Using -R for the project root to allow flexible module loading
--R . TAPL
+-Q src TAPL
+-Q plf PLF
+-Q Tactics TAPL.Tactics
+-Q Props TAPL.Props
 
 # Source files
 src/UntypedArithExpr.v
 src/ArithExpr.v
+src/Stlc.v
+
+# Programming Language Foundations
+plf/Bib.v
+plf/Equiv.v
 plf/Maps.v
+plf/Hoare.v
+plf/Hoare2.v
+plf/HoareAsLogic.v
+plf/Imp.v
+plf/IMP.v
+plf/LibTactics.v
+plf/Smallstep.v
+plf/Types.v
+plf/Typechecking.v
+plf/Stlc.v
+plf/MoreStlc.v
+plf/StlcProp.v
+plf/Norm.v
+plf/PE.v
+plf/Records.v
+plf/References.v
+plf/Sub.v
+plf/UseAuto.v
+plf/UseTactics.v
+
+# Tactics and Properties
 Tactics/Tactics.v
 Props/RelationProp.v

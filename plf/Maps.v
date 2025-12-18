@@ -30,15 +30,15 @@
     standard library, wherever they overlap. *)
 
 From Stdlib Require Import Arith.
-From Stdlib Require Import Bool. 
+From Stdlib Require Import Bool.
 From Stdlib Require Export Strings.String.
 From Stdlib Require Import FunctionalExtensionality.
 From Stdlib Require Import List.
-Import ListNotations. 
+Import ListNotations.
 Set Default Goal Selector "!".
 
 (** Documentation for the standard library can be found at
-    https://rocq-prover.org/doc/V9.0.0/Coq/index.html.
+    https://rocq-prover.org/doc/V9.0.0/stdlib/index.html.
 
     The [Search] command is a good way to look for theorems involving
     objects of specific types. See [Lists] for a reminder of how
@@ -48,12 +48,12 @@ Set Default Goal Selector "!".
     [Locate] command is useful.  For example, where is the natural
     addition operation defined in the standard library? *)
 
-(* Locate "+". *)
+Locate "+".
 
 (** (There are several uses of the [+] notation, but only one for
     naturals.) *)
 
-(* Print Init.Nat.add. *)
+Print Init.Nat.add.
 
 (** We'll see some more uses of [Locate] in the [Imp] chapter. *)
 
@@ -68,24 +68,16 @@ Set Default Goal Selector "!".
 (** To compare strings, we use the function [eqb] from the [String]
     module in the standard library. *)
 
-(* Locate eqb_refl. *)
-
-(* Print String.eqb_refl. *)
-(* 
 Check String.eqb_refl :
-  forall x : string, (x =? x)%string = true. *)
+  forall x : string, (x =? x)%string = true.
 
-(* Locate "=". *)
-(* Print eq. *)
 (** We will often use a few basic properties of string equality... *)
-(* Check String.eqb_eq :
+Check String.eqb_eq :
   forall n m : string, (n =? m)%string = true <-> n = m.
 Check String.eqb_neq :
-  forall n m : string, (n =? m)%string = false <-> n <> m. *)
-
-(* Print reflect. *)
-(* Check String.eqb_spec :
-  forall x y : string, reflect (x = y) (String.eqb x y). *)
+  forall n m : string, (n =? m)%string = false <-> n <> m.
+Check String.eqb_spec :
+  forall x y : string, reflect (x = y) (String.eqb x y).
 
 (* ################################################################# *)
 (** * Total Maps *)
@@ -118,9 +110,6 @@ Definition total_map (A : Type) := string -> A.
 Definition t_empty {A : Type} (v : A) : total_map A :=
   (fun _ => v).
 
-(* Check t_empty 0 : total_map nat.
-Check t_empty 1 : total_map nat. *)
-
 (** More interesting is the map-updating function, which (as always)
     takes a map [m], a key [x], and a value [v] and returns a new map
     that takes [x] to [v] and takes every other key to whatever [m]
@@ -131,8 +120,6 @@ Definition t_update {A : Type} (m : total_map A)
                     (x : string) (v : A) :=
   fun x' => if String.eqb x x' then v else m x'.
 
-(* Check @t_update. *)
-
 (** This definition is a nice example of higher-order programming:
     [t_update] takes a _function_ [m] and yields a new function
     [fun x' => ...] that behaves like the desired map. *)
@@ -140,8 +127,6 @@ Definition t_update {A : Type} (m : total_map A)
 (** For example, we can build a map taking [string]s to [bool]s, where
     ["foo"] and ["bar"] are mapped to [true] and every other key is
     mapped to [false], like this: *)
-
-(* Check t_empty false : total_map bool. *)
 
 Definition examplemap :=
   t_update (t_update (t_empty false) "foo" true)
@@ -200,17 +185,10 @@ Proof. reflexivity. Qed.
 
     First, the empty map returns its default element for all keys: *)
 
-(* Print t_empty. *)
-(* Check @t_empty. *)
-
 Lemma t_apply_empty : forall (A : Type) (x : string) (v : A),
   (_ !-> v) x = v.
 Proof.
-  intros.
-  unfold t_empty.
-  reflexivity.
-Qed.
-
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (t_update_eq)
@@ -222,14 +200,8 @@ Qed.
 Lemma t_update_eq : forall (A : Type) (m : total_map A) x v,
   (x !-> v ; m) x = v.
 Proof.
-  intros A m x v.
-  unfold t_update.
-  rewrite eqb_refl.
-  reflexivity.
-Qed.
+  (* FILL IN HERE *) Admitted.
 (** [] *)
-
-(* Locate "!->". *)
 
 (** **** Exercise: 2 stars, standard, optional (t_update_neq)
 
@@ -237,19 +209,11 @@ Qed.
     look up a _different_ key [x2] in the resulting map, we get the
     same result that [m] would have given: *)
 
-(* Locate "<>". *)
-(* Search eqb. *)
-(* Check eqb_neq. *)
 Theorem t_update_neq : forall (A : Type) (m : total_map A) x1 x2 v,
   x1 <> x2 ->
   (x1 !-> v ; m) x2 = m x2.
 Proof.
-  intros A m x1 x2 v H.
-  unfold t_update.
-  rewrite <- eqb_neq in H.
-  rewrite H.
-  reflexivity.
-Qed.
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (t_update_shadow)
@@ -263,18 +227,9 @@ Qed.
 Lemma t_update_shadow : forall (A : Type) (m : total_map A) x v1 v2,
   (x !-> v2 ; x !-> v1 ; m) = (x !-> v2 ; m).
 Proof.
-  intros A m x v1 v2.
-  unfold t_update.
-  apply functional_extensionality.
-  intros x0.
-  destruct (x=?x0)%string.
-  - reflexivity.
-  - reflexivity.
-Qed.
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
-(* Check eqb_spec. *)
-(* Check reflect. *)
 (** **** Exercise: 2 stars, standard (t_update_same)
 
     Given [string]s [x1] and [x2], we can use the tactic
@@ -289,15 +244,7 @@ Qed.
 Theorem t_update_same : forall (A : Type) (m : total_map A) x,
   (x !-> m x ; m) = m.
 Proof.
-  intros A m x.
-  unfold t_update.
-  apply functional_extensionality.
-  intros x0.
-  destruct (String.eqb_spec x x0).
-  - rewrite e. reflexivity.
-  - reflexivity.
-Qed.
-
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, especially useful (t_update_permute)
@@ -313,14 +260,7 @@ Theorem t_update_permute : forall (A : Type) (m : total_map A)
   =
   (x2 !-> v2 ; x1 !-> v1 ; m).
 Proof.
-  intros A m v1 v2 x1 x2 H.
-  unfold t_update.
-  apply functional_extensionality.
-  intros x.
-  destruct (String.eqb_spec x1 x).
-  - rewrite e in H. rewrite <- eqb_neq in H. rewrite H. reflexivity.
-  - reflexivity.
-Qed.
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 (* ################################################################# *)
@@ -351,8 +291,6 @@ Definition examplepmap :=
 
 (** We now straightforwardly lift all of the basic lemmas about total
     maps to partial maps.  *)
-
-(* Check t_apply_empty. *)
 
 Lemma apply_empty : forall (A : Type) (x : string),
   @empty A x = None.

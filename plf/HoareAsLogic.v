@@ -19,8 +19,8 @@
     Foundations_ (_Software Foundations_, volume 1). *)
 
 Set Warnings "-deprecated-hint-without-locality,-deprecated-hint-without-locality,-parsing".
-From TAPL.plf Require Import Maps.
-From TAPL.plf Require Import Hoare.
+From PLF Require Import Maps.
+From PLF Require Import Hoare.
 
 Hint Constructors ceval : core.
 
