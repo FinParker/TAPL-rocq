@@ -1,21 +1,57 @@
 #!/bin/bash
-# Build script for TAPL Rocq Project with Caching support
+# Distributed build script for TAPL Rocq Project
+# Each subdirectory maintains its own _CoqProject
 
 set -e
 
-# 1. 只有当 CoqMakefile 不存在，或者 _CoqProject 比它新时，才重新生成
-if [ ! -f CoqMakefile ] || [ _CoqProject -nt CoqMakefile ]; then
-    echo "==> _CoqProject changed or CoqMakefile missing. Updating..."
-    rocq makefile -f _CoqProject -o CoqMakefile
-else
-    echo "==> CoqMakefile is up to date."
-fi
+# Define build order (respecting dependencies)
+# Props and Tactics have no dependencies
+# plf has no dependencies (builds PLF modules)
+# src depends on Props, Tactics, and plf
+MODULES=("Props" "Tactics" "plf" "src")
 
-# 2. 直接运行 make。
-# CoqMakefile 内部会处理依赖关系（.CoqMakefile.d），只编译改变的文件。
-echo "==> Building the project (incremental)..."
+echo "==> Building TAPL Rocq Project (distributed mode)"
+echo ""
 
-# 使用全部 CPU 核心进行并行编译
-make -j$(nproc) -f CoqMakefile
+# Function to build a single module
+build_module() {
+    local module=$1
+    echo "===> Building module: $module"
+    
+    cd "$module"
+    
+    # Check if _CoqProject exists
+    if [ ! -f _CoqProject ]; then
+        echo "     WARNING: No _CoqProject found in $module, skipping..."
+        cd ..
+        return
+    fi
+    
+    # Generate or update Makefile
+    if [ ! -f Makefile ] || [ _CoqProject -nt Makefile ]; then
+        echo "     Generating Makefile from _CoqProject..."
+        rocq makefile -f _CoqProject -o Makefile
+    else
+        echo "     Makefile is up to date"
+    fi
+    
+    # Build with parallel jobs
+    echo "     Compiling..."
+    make -j$(nproc) -f Makefile
+    
+    cd ..
+    echo "     ✓ $module build complete"
+    echo ""
+}
 
-echo "==> Build finished!"
+# Build each module in order
+for module in "${MODULES[@]}"; do
+    if [ -d "$module" ]; then
+        build_module "$module"
+    else
+        echo "     WARNING: Directory $module not found, skipping..."
+        echo ""
+    fi
+done
+
+echo "==> All modules built successfully!"

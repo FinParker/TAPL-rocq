@@ -1,11 +1,8 @@
 {
   // VsRocq Extension Configuration (rocq-prover.vsrocq)
   "vsrocq.path": "/home/zsj/.opam/rocq-9.0.0/bin/vsrocqtop",
-  "vsrocq.args": [
-    "-R",
-    ".",
-    "TAPL"
-  ],
+  // Use _CoqProject files for configuration
+  // "vsrocq.args": [] is omitted to let VSCoq find and use _CoqProject files automatically
   // File associations - CRITICAL
   "files.associations": {
     "*.v": "rocq"

@@ -1,1 +1,27 @@
 -Q . PLF 
+# Programming Language Foundations modules
+Bib.v
+Equiv.v
+Hoare.v
+Hoare2.v
+HoareAsLogic.v
+IMP.v
+Imp.v
+LibTactics.v
+Maps.v
+MoreStlc.v
+Norm.v
+PE.v
+Postscript.v
+Preface.v
+RecordSub.v
+Records.v
+References.v
+Smallstep.v
+Stlc.v
+StlcProp.v
+Sub.v
+Typechecking.v
+Types.v
+UseAuto.v
+UseTactics.v

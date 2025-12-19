@@ -28,26 +28,53 @@ rocq --version  # Verify installation
 
 ## Building the Project
 
-### Option A: Quick Build (Recommended)
+### 🎯 Quick Start (Distributed Build)
+
+This project uses **distributed `_CoqProject` management** - each module maintains its own configuration.
 
 ```sh
+# Build all modules (Props → Tactics → src → plf)
 ./run_make.sh
+
+# Clean all modules
+./clean_all.sh
 ```
 
-This script will:
-1. Clean previous builds
-2. Generate CoqMakefile
-3. Build all files
+### 📦 Project Structure
 
-### Option B: Manual Build
+```
+TAPL-rocq/
+├── Props/        # Basic relation properties
+│   └── _CoqProject (-Q . TAPL.Props)
+├── Tactics/      # Proof tactics library
+│   └── _CoqProject (-Q . TAPL.Tactics)
+├── src/          # Core TAPL implementations
+│   └── _CoqProject (-Q . TAPL, with deps to Props/Tactics/plf)
+└── plf/          # Programming Language Foundations
+    └── _CoqProject (-Q . PLF)
+```
 
-**Step 1: Generate CoqMakefile**
+### 🔨 Manual Build
+
+Build a specific module:
+
+```sh
+cd src  # or Props, Tactics, plf
+rocq makefile -f _CoqProject -o Makefile
+make -j$(nproc)
+```
+
+See [BUILD.md](BUILD.md) for detailed build instructions.
+
+### 🧹 Cleaning
+
+**Step 1: Generate CoqMakefile** (legacy, not used in distributed mode)
 
 ```sh
 rocq makefile -f _CoqProject -o CoqMakefile
 ```
 
-**Step 2: Build**
+**Step 2: Build** (legacy)
 
 ```sh
 make           # Build all files

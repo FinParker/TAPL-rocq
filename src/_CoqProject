@@ -1,0 +1,8 @@
+-Q . TAPL
+-Q ../Props TAPL.Props
+-Q ../Tactics TAPL.Tactics
+-Q ../plf PLF
+
+UntypedArithExpr.v
+ArithExpr.v
+Stlc.v

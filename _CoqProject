@@ -1,38 +1,19 @@
-# TAPL Rocq Project Configuration
--Q src TAPL
--Q plf PLF
--Q Tactics TAPL.Tactics
--Q Props TAPL.Props
-
-# Source files
-src/UntypedArithExpr.v
-src/ArithExpr.v
-src/Stlc.v
-
-# Programming Language Foundations
-plf/Bib.v
-plf/Equiv.v
-plf/Maps.v
-plf/Hoare.v
-plf/Hoare2.v
-plf/HoareAsLogic.v
-plf/Imp.v
-plf/IMP.v
-plf/LibTactics.v
-plf/Smallstep.v
-plf/Types.v
-plf/Typechecking.v
-plf/Stlc.v
-plf/MoreStlc.v
-plf/StlcProp.v
-plf/Norm.v
-plf/PE.v
-plf/Records.v
-plf/References.v
-plf/Sub.v
-plf/UseAuto.v
-plf/UseTactics.v
-
-# Tactics and Properties
-Tactics/Tactics.v
-Props/RelationProp.v
+# TAPL Rocq Project Configuration (REFERENCE ONLY)
+# 
+# This file is kept for reference only.
+# Actual builds use individual _CoqProject files in each subdirectory:
+#   - Props/_CoqProject
+#   - Tactics/_CoqProject  
+#   - src/_CoqProject
+#   - plf/_CoqProject
+#
+# Use ./run_make.sh to build all modules
+# Use ./clean_all.sh to clean all modules
+#
+# ============================================================
+# Module Logical Paths (for reference):
+# ============================================================
+# -Q Props TAPL.Props
+# -Q Tactics TAPL.Tactics
+# -Q src TAPL
+# -Q plf PLF
