@@ -17,3 +17,9 @@ Ltac solve_by_inverts n :=
 
 Ltac solve_by_invert :=
   solve_by_inverts 1.
+
+Ltac solve_exists_contradiction :=
+  match goal with
+  | [ Hnot: ~ (exists x, ?P x), Hinst: ?P ?val |- _ ] =>
+      destruct Hnot; exists val; exact Hinst
+  end.

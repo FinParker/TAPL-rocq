@@ -9,9 +9,21 @@ set -e
 # plf has no dependencies (builds PLF modules)
 # src depends on Props, Tactics, and plf
 MODULES=("Props" "Tactics" "plf" "src")
+DOC_ROOT="$(pwd)/docs"
+STYLE_SOURCE="$(pwd)/common"
 
-echo "==> Building TAPL Rocq Project (distributed mode)"
+echo "==> Building TAPL Rocq Project and Documentation"
 echo ""
+mkdir -p "$DOC_ROOT"
+
+# Copy common style files from project common to docs/common
+if [ -d "$STYLE_SOURCE" ]; then
+    echo "===> Copying style files from common to docs/common"
+    mkdir -p "$DOC_ROOT/common"
+    cp -r "$STYLE_SOURCE"/* "$DOC_ROOT/common/"
+    echo "     ✓ Style files copied"
+    echo ""
+fi
 
 # Function to build a single module
 build_module() {
@@ -39,8 +51,39 @@ build_module() {
     echo "     Compiling..."
     make -j$(nproc) -f Makefile
     
-    cd ..
     echo "     ✓ $module build complete"
+    echo ""
+
+    # Generate documentation
+    echo "     Generating coqdoc..."
+    mkdir -p "$DOC_ROOT/$module"
+    
+    make html COQDOCFLAGS="--utf8"
+    
+    if [ -d "html" ]; then
+        cp -r html/* "$DOC_ROOT/$module/"
+        
+        # Update CSS links to use common styles
+        if [ -f "$DOC_ROOT/$module/coqdoc.css" ]; then
+            # Create a custom CSS file that imports the PLF styles
+            cat > "$DOC_ROOT/$module/coqdoc.css" << 'EOF'
+@import url('../common/css/plf.css');
+@import url('../common/css/sf.css');
+EOF
+        fi
+        
+        # Update HTML files to reference common styles
+        for html_file in "$DOC_ROOT/$module"/*.html; do
+            if [ -f "$html_file" ]; then
+                # Add link to common styles in HTML head
+                sed -i '/<head>/a <link href="../common/css/plf.css" rel="stylesheet" type="text/css" />\n<link href="../common/css/sf.css" rel="stylesheet" type="text/css" />' "$html_file"
+            fi
+        done
+        
+        echo "     ✓ Documentation for $module available at docs/$module/index.html"
+    fi
+    
+    cd ..
     echo ""
 }
 
@@ -54,4 +97,4 @@ for module in "${MODULES[@]}"; do
     fi
 done
 
-echo "==> All modules built successfully!"
+echo "==> All modules and docs built successfully!"

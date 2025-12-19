@@ -38,4 +38,21 @@ done
 # Clean root directory generated files
 rm -f CoqMakefile CoqMakefile.conf .CoqMakefile.d
 
+# Clean documentation directory
+if [ -d "docs" ]; then
+    echo "===> Cleaning documentation directory"
+    rm -rf docs
+    echo "     ✓ Documentation cleaned"
+    echo ""
+fi
+
+# Clean html directories in modules
+for module in "${MODULES[@]}"; do
+    if [ -d "$module/html" ]; then
+        echo "===> Cleaning html in $module"
+        rm -rf "$module/html"
+        echo "     ✓ HTML cleaned"
+    fi
+done
+
 echo "==> Clean complete!"
