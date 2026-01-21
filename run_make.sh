@@ -31,6 +31,13 @@ if [ -d "$STYLE_SOURCE" ]; then
     mkdir -p "$DOC_ROOT"
     rm -rf "$DOC_ROOT/common"
     cp -r "$STYLE_SOURCE" "$DOC_ROOT/common"
+    
+    # Copy the main index page if it exists in common
+    if [ -f "$STYLE_SOURCE/index.html" ]; then
+        cp "$STYLE_SOURCE/index.html" "$DOC_ROOT/index.html"
+        echo "     ✓ Main index.html copied"
+    fi
+
     echo "     ✓ Style files copied"
     echo ""
 fi
