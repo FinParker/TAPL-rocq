@@ -1,0 +1,39 @@
+name: Build and Deploy Documentation
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rocq Prover
+        uses: coq-community/docker-coq-action@v1
+        with:
+          opam_file: 'tapl-rocq.opam'
+          custom_image: 'ocaml/opam:ubuntu-lts-ocaml-4.14'
+          before_install: |
+            opam repo add rocq-released https://rocq-prover.org/opam/released
+            opam update
+          before_script: |
+            sudo chown -R opam:opam .
+          script: |
+            ./run_make.sh
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          force_orphan: true

@@ -281,7 +281,7 @@ Proof with auto.
   intros x y z Hval Hstep Heval.
   generalize dependent z.
   induction Hstep; intros z Hval Heval; (try solve_by_invert)...
-
+Admitted.
 
 Lemma eval_from_steps : forall t v,
   t -->* v ->
@@ -294,8 +294,6 @@ Proof with auto.
     apply B_Value. exact Hval.
   - (* multi_step *)
     apply IHHmulti in Hval.
-    
-
 Admitted.
 
 Theorem eval_iff_steps : forall t v,

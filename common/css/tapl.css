@@ -1,0 +1,309 @@
+/* Modern TAPL-rocq Style for Software Foundations (replacing sf.css) */
+
+:root {
+  --primary-color: #b25959;
+  --text-color: #24292e;
+  --bg-color: #ffffff;
+  --code-bg: #f6f8fa;
+  --link-color: #0366d6;
+  --border-color: #e1e4e8;
+  --proof-bg: #f8f9fa;
+  --proof-border: #dfe2e5;
+  --highlight-color: #ffe8e8;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Page Container */
+#page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background-color: white;
+  box-sizing: border-box;
+}
+
+/* Header */
+#header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+#header h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin: 0 0 10px 0;
+  border: none;
+  padding: 0;
+}
+
+.booktitleinheader {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #6a737d;
+}
+
+.booktitleinheader a {
+  color: inherit;
+}
+
+#logoinheader {
+  margin-bottom: 15px;
+}
+
+#logoinheader img {
+  height: 60px;
+  /* Constrain logo size */
+  width: auto;
+}
+
+/* Navigation Menu */
+ul#menu {
+  list-style: none;
+  padding: 0;
+  text-align: center;
+  margin: 20px 0;
+}
+
+ul#menu li {
+  display: inline-block;
+  margin: 0 5px;
+}
+
+ul#menu li a {
+  display: inline-block;
+  padding: 6px 12px;
+  color: var(--text-color);
+  background-color: var(--code-bg);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+ul#menu li a:hover {
+  background-color: #e1e4e8;
+  text-decoration: none;
+  color: #000;
+}
+
+ul#menu li.section_name {
+  background: none;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+/* Headings */
+h1.section,
+h2.section {
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+  margin-top: 2em;
+}
+
+h1 {
+  font-size: 2em;
+}
+
+h2 {
+  font-size: 1.5em;
+}
+
+h3 {
+  font-size: 1.25em;
+  margin-top: 1.5em;
+}
+
+h4 {
+  font-size: 1em;
+  font-weight: bold;
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Code Blocks */
+div.code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 14px;
+  background-color: var(--code-bg);
+  padding: 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin-bottom: 16px;
+  line-height: 1.45;
+}
+
+/* Inline Code */
+span.inlinecode {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 85%;
+  padding: 0.2em 0.4em;
+  margin: 0;
+  background-color: rgba(27, 31, 35, 0.05);
+  border-radius: 3px;
+  white-space: pre-wrap;
+  vertical-align: middle;
+}
+
+/* Syntax Highlighting overrides */
+.id {
+  color: #24292e;
+}
+
+.id[title="keyword"] {
+  color: #d73a49;
+  font-weight: bold;
+}
+
+.id[title="tactic"] {
+  color: #6f42c1;
+}
+
+.id[title="notation"] {
+  color: #005cc5;
+}
+
+.id[title="variable"] {
+  color: #24292e;
+}
+
+.id[title="lemma"],
+.id[title="theorem"],
+.id[title="definition"],
+.id[title="induction"],
+.id[title="instance"] {
+  color: #22863a;
+  font-weight: bold;
+}
+
+.id[title="constructor"] {
+  color: #032f62;
+}
+
+.comment {
+  color: #6a737d;
+  font-style: italic;
+}
+
+/* Proof toggles */
+.proofscript {
+  background-color: white;
+  border: 1px solid var(--proof-border);
+  border-left: 4px solid var(--primary-color);
+  padding: 10px 15px;
+  margin: 10px 0 20px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.hidden {
+  display: none;
+}
+
+div.button {
+  font-family: inherit;
+  font-size: 12px;
+  display: inline-block;
+  padding: 4px 8px;
+  cursor: pointer;
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: #555;
+  margin-top: 5px;
+}
+
+div.button:hover {
+  background-color: #e1e4e8;
+  color: #000;
+}
+
+/* Tables and Listeners */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 20px 0;
+}
+
+td,
+th {
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+}
+
+ul.doclist {
+  margin-left: 20px;
+  margin-bottom: 20px;
+}
+
+/* Hide nested lists in Table of Contents to keep it clean (Level 3+) */
+#toc ul.doclist ul.doclist {
+  display: none;
+}
+
+ul.doclist li {
+  margin-bottom: 8px;
+}
+
+/* Paragraphs */
+div.paragraph {
+  margin-bottom: 1em;
+  display: block;
+  /* Ensure it takes space */
+}
+
+/* Spacing fix for Coqdoc output */
+br {
+  display: block;
+  margin: 5px 0;
+  content: " ";
+}
+
+/* TOC Styles */
+#index_content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.column {
+  flex: 1;
+  min-width: 300px;
+  padding: 0 10px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  #page {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 1.8em;
+  }
+
+  .code,
+  .inlinecode {
+    font-size: 13px;
+  }
+}

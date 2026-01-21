@@ -1,0 +1,17 @@
+opam-version: "2.0"
+synopsis: "TAPL implemented in Rocq/Coq"
+description: "Formalization of Types and Programming Languages"
+maintainer: "Author"
+authors: "Author"
+license: "MIT"
+homepage: "https://github.com/username/TAPL-rocq"
+bug-reports: "https://github.com/username/TAPL-rocq/issues"
+depends: [
+  "rocq-prover" {= "9.0.0"}
+]
+build: [
+  ["./run_make.sh"]
+]
+install: [
+  ["./run_make.sh"]
+]

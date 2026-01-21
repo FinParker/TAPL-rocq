@@ -177,3 +177,13 @@ If `.v` files are not recognized or highlighted:
 - The `-R` flag in `_CoqProject` allows flexible module loading
 - All files use the `TAPL` logical root namespace
 - VS Code must be launched with opam environment loaded for VsRocq to work
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### Acknowledgments & Dependencies
+
+This project contains code from [Software Foundations](https://softwarefoundations.cis.upenn.edu/), specifically Volume 2 (Programming Language Foundations), located in the `plf/` directory.
+- The content in the `plf/` directory is Copyright (c) 2025 University of Pennsylvania and/or original authors.
+- It is licensed under the MIT License (or applicable license as specified in `plf/LICENSE`).
+- Code in `plf/` serves as a foundation/reference for this project.
