@@ -17,18 +17,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Rocq Prover
-        uses: coq-community/docker-coq-action@v1
+      - name: Install OCaml
+        uses: ocaml/setup-ocaml@v3
         with:
-          opam_file: 'tapl-rocq.opam'
-          custom_image: 'ocaml/opam:ubuntu-lts-ocaml-4.14'
-          before_install: |
-            opam repo add rocq-released https://rocq-prover.org/opam/released
-            opam update
-          before_script: |
-            sudo chown -R opam:opam .
-          script: |
-            ./run_make.sh
+          ocaml-compiler: 4.14.1
+
+      - name: Install Rocq Dependencies
+        run: |
+          # Add Rocq repository
+          opam repo add rocq-released https://rocq-prover.org/opam/released
+          opam update
+          
+          # Install dependencies defined in tapl-rocq.opam
+          # This will install rocq-prover 9.0.0
+          opam install . --deps-only --with-test
+
+      - name: Build and Generate Documentation
+        run: |
+          eval $(opam env)
+          ./run_make.sh
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
