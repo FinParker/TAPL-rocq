@@ -1,0 +1,759 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link href="../common/css/tapl.css" rel="stylesheet" type="text/css" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>TAPL.ArithExpr</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library TAPL.ArithExpr</h1>
+
+<div class="code">
+</div>
+
+<div class="doc">
+<a id="lab1"></a><h1 class="section">ArithExpr: The Typed Calculus of Booleans and Numbers</h1>
+
+</div>
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+The system studied in this chapter is the typed calculus of booleans 
+    and numbers. The corresponding OCaml implementation is `tyarith`. 
+
+<div class="paragraph"> </div>
+
+    This is the simplest typed language we'll study: it has no functions
+    and no variables, but it does have types and type checking.
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Set</span> <span class="id" title="var">Warnings</span> "-notation-overridden,-parsing,-deprecated-hint-without-locality".<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">Stdlib</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="library">List</span> <span class="id" title="library">Strings.String</span>.<br/>
+<span class="id" title="keyword">Import</span> <span class="id" title="module">ListNotations</span>.<br/>
+<span class="id" title="keyword">From</span> <span class="id" title="var">TAPL</span> <span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <span class="id" title="library">Tactics</span> <span class="id" title="library">RelationProp</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Module</span> <a id="TypedArithExpr" class="idref" href="#TypedArithExpr"><span class="id" title="module">TypedArithExpr</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab2"></a><h2 class="section">Types</h2>
+
+<div class="paragraph"> </div>
+
+ The types of this calculus are <span class="inlinecode"><span class="id" title="var">Bool</span></span> and <span class="inlinecode"><span class="id" title="var">Nat</span></span>. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="TypedArithExpr.ty" class="idref" href="#TypedArithExpr.ty"><span class="id" title="definition, inductive"><span id="TypedArithExpr.ty_rect" class="id"><span id="TypedArithExpr.ty_ind" class="id"><span id="TypedArithExpr.ty_rec" class="id"><span id="TypedArithExpr.ty_sind" class="id">ty</span></span></span></span></span></a> : <span class="id" title="keyword">Type</span> :=<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.Ty_Bool" class="idref" href="#TypedArithExpr.Ty_Bool"><span class="id" title="constructor">Ty_Bool</span></a> : <a class="idref" href="TAPL.ArithExpr.html#ty:1"><span class="id" title="inductive">ty</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.Ty_Nat" class="idref" href="#TypedArithExpr.Ty_Nat"><span class="id" title="constructor">Ty_Nat</span></a> : <a class="idref" href="TAPL.ArithExpr.html#ty:1"><span class="id" title="inductive">ty</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Some examples of types: 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a id="TypedArithExpr.example_ty1" class="idref" href="#TypedArithExpr.example_ty1"><span class="id" title="definition">example_ty1</span></a> := <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.Ty_Bool"><span class="id" title="constructor">Ty_Bool</span></a>.<br/>
+<span class="id" title="keyword">Example</span> <a id="TypedArithExpr.example_ty2" class="idref" href="#TypedArithExpr.example_ty2"><span class="id" title="definition">example_ty2</span></a> := <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.Ty_Nat"><span class="id" title="constructor">Ty_Nat</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab3"></a><h2 class="section">Terms</h2>
+
+<div class="paragraph"> </div>
+
+ The syntax of arithmetic expressions: 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="TypedArithExpr.tm" class="idref" href="#TypedArithExpr.tm"><span class="id" title="definition, inductive"><span id="TypedArithExpr.tm_rect" class="id"><span id="TypedArithExpr.tm_ind" class="id"><span id="TypedArithExpr.tm_rec" class="id"><span id="TypedArithExpr.tm_sind" class="id">tm</span></span></span></span></span></a> : <span class="id" title="keyword">Type</span> :=<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.tm_true" class="idref" href="#TypedArithExpr.tm_true"><span class="id" title="constructor">tm_true</span></a> : <a class="idref" href="TAPL.ArithExpr.html#tm:3"><span class="id" title="inductive">tm</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.tm_false" class="idref" href="#TypedArithExpr.tm_false"><span class="id" title="constructor">tm_false</span></a> : <a class="idref" href="TAPL.ArithExpr.html#tm:3"><span class="id" title="inductive">tm</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.tm_if" class="idref" href="#TypedArithExpr.tm_if"><span class="id" title="constructor">tm_if</span></a> : <a class="idref" href="TAPL.ArithExpr.html#tm:3"><span class="id" title="inductive">tm</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="TAPL.ArithExpr.html#tm:3"><span class="id" title="inductive">tm</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="TAPL.ArithExpr.html#tm:3"><span class="id" title="inductive">tm</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="TAPL.ArithExpr.html#tm:3"><span class="id" title="inductive">tm</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.tm_zero" class="idref" href="#TypedArithExpr.tm_zero"><span class="id" title="constructor">tm_zero</span></a> : <a class="idref" href="TAPL.ArithExpr.html#tm:3"><span class="id" title="inductive">tm</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.tm_succ" class="idref" href="#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> : <a class="idref" href="TAPL.ArithExpr.html#tm:3"><span class="id" title="inductive">tm</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="TAPL.ArithExpr.html#tm:3"><span class="id" title="inductive">tm</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.tm_pred" class="idref" href="#TypedArithExpr.tm_pred"><span class="id" title="constructor">tm_pred</span></a> : <a class="idref" href="TAPL.ArithExpr.html#tm:3"><span class="id" title="inductive">tm</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="TAPL.ArithExpr.html#tm:3"><span class="id" title="inductive">tm</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.tm_iszero" class="idref" href="#TypedArithExpr.tm_iszero"><span class="id" title="constructor">tm_iszero</span></a> : <a class="idref" href="TAPL.ArithExpr.html#tm:3"><span class="id" title="inductive">tm</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="TAPL.ArithExpr.html#tm:3"><span class="id" title="inductive">tm</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Some examples of terms: 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Example</span> <a id="TypedArithExpr.example_tm1" class="idref" href="#TypedArithExpr.example_tm1"><span class="id" title="definition">example_tm1</span></a> := <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_if"><span class="id" title="constructor">tm_if</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_true"><span class="id" title="constructor">tm_true</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_false"><span class="id" title="constructor">tm_false</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_true"><span class="id" title="constructor">tm_true</span></a>.<br/>
+<span class="id" title="keyword">Example</span> <a id="TypedArithExpr.example_tm2" class="idref" href="#TypedArithExpr.example_tm2"><span class="id" title="definition">example_tm2</span></a> := <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_zero"><span class="id" title="constructor">tm_zero</span></a>).<br/>
+<span class="id" title="keyword">Example</span> <a id="TypedArithExpr.example_tm3" class="idref" href="#TypedArithExpr.example_tm3"><span class="id" title="definition">example_tm3</span></a> := <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_iszero"><span class="id" title="constructor">tm_iszero</span></a> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_pred"><span class="id" title="constructor">tm_pred</span></a> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_zero"><span class="id" title="constructor">tm_zero</span></a>)).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab4"></a><h2 class="section">Values</h2>
+
+<div class="paragraph"> </div>
+
+ A value is a term that has finished evaluating. In this language,
+    the values are:
+<ul class="doclist">
+<li> boolean constants <span class="inlinecode"><span class="id" title="var">true</span></span> and <span class="inlinecode"><span class="id" title="var">false</span></span>
+
+</li>
+<li> numeric values (0 or a number built from 0 with <span class="inlinecode"><span class="id" title="var">succ</span></span>)
+
+</li>
+</ul>
+
+<div class="paragraph"> </div>
+
+ Boolean values 
+</div>
+<div class="code">
+<span class="id" title="keyword">Inductive</span> <a id="TypedArithExpr.bv" class="idref" href="#TypedArithExpr.bv"><span class="id" title="definition, inductive"><span id="TypedArithExpr.bv_ind" class="id"><span id="TypedArithExpr.bv_sind" class="id">bv</span></span></span></a>: <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.bv_true" class="idref" href="#TypedArithExpr.bv_true"><span class="id" title="constructor">bv_true</span></a>: <a class="idref" href="TAPL.ArithExpr.html#bv:5"><span class="id" title="inductive">bv</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_true"><span class="id" title="constructor">tm_true</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.bv_false" class="idref" href="#TypedArithExpr.bv_false"><span class="id" title="constructor">bv_false</span></a>: <a class="idref" href="TAPL.ArithExpr.html#bv:5"><span class="id" title="inductive">bv</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_false"><span class="id" title="constructor">tm_false</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Numeric values (natural numbers) 
+</div>
+<div class="code">
+<span class="id" title="keyword">Inductive</span> <a id="TypedArithExpr.nv" class="idref" href="#TypedArithExpr.nv"><span class="id" title="definition, inductive"><span id="TypedArithExpr.nv_ind" class="id"><span id="TypedArithExpr.nv_sind" class="id">nv</span></span></span></a>: <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.nv_zero" class="idref" href="#TypedArithExpr.nv_zero"><span class="id" title="constructor">nv_zero</span></a>: <a class="idref" href="TAPL.ArithExpr.html#nv:7"><span class="id" title="inductive">nv</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_zero"><span class="id" title="constructor">tm_zero</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.nv_succ" class="idref" href="#TypedArithExpr.nv_succ"><span class="id" title="constructor">nv_succ</span></a>: <span class="id" title="keyword">∀</span> <a id="t:9" class="idref" href="#t:9"><span class="id" title="binder">t</span></a>, <a class="idref" href="TAPL.ArithExpr.html#nv:7"><span class="id" title="inductive">nv</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:9"><span class="id" title="variable">t</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="TAPL.ArithExpr.html#nv:7"><span class="id" title="inductive">nv</span></a> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:9"><span class="id" title="variable">t</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+All values 
+</div>
+<div class="code">
+<span class="id" title="keyword">Inductive</span> <a id="TypedArithExpr.value" class="idref" href="#TypedArithExpr.value"><span class="id" title="definition, inductive"><span id="TypedArithExpr.value_ind" class="id"><span id="TypedArithExpr.value_sind" class="id">value</span></span></span></a>: <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.v_bv" class="idref" href="#TypedArithExpr.v_bv"><span class="id" title="constructor">v_bv</span></a>: <span class="id" title="keyword">∀</span> <a id="t:12" class="idref" href="#t:12"><span class="id" title="binder">t</span></a>, <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.bv"><span class="id" title="inductive">bv</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:12"><span class="id" title="variable">t</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="TAPL.ArithExpr.html#value:10"><span class="id" title="inductive">value</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:12"><span class="id" title="variable">t</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.v_nv" class="idref" href="#TypedArithExpr.v_nv"><span class="id" title="constructor">v_nv</span></a>: <span class="id" title="keyword">∀</span> <a id="t:13" class="idref" href="#t:13"><span class="id" title="binder">t</span></a>, <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nv"><span class="id" title="inductive">nv</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:13"><span class="id" title="variable">t</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="TAPL.ArithExpr.html#value:10"><span class="id" title="inductive">value</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:13"><span class="id" title="variable">t</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Constructors</span> <a class="idref" href="TAPL.ArithExpr.html#bv"><span class="id" title="inductive">bv</span></a> <a class="idref" href="TAPL.ArithExpr.html#nv"><span class="id" title="inductive">nv</span></a> <a class="idref" href="TAPL.ArithExpr.html#value"><span class="id" title="inductive">value</span></a> : <span class="id" title="var">core</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab5"></a><h2 class="section">Small-step Operational Semantics</h2>
+
+<div class="paragraph"> </div>
+
+ We define the small-step evaluation relation. The evaluation is
+    deterministic and can either reduce to a value or get stuck. For
+    example, <span class="inlinecode"><span class="id" title="var">pred</span></span> <span class="inlinecode"><span class="id" title="var">false</span></span> gets stuck because there's no evaluation
+    rule for it. 
+</div>
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab6"></a><h2 class="section">Small-step semantics</h2>
+
+</div>
+<div class="code">
+<span class="id" title="keyword">Reserved Notation</span> &quot;e '--&gt;' n" (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 90, <span class="id" title="tactic">left</span> <span class="id" title="keyword">associativity</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Evaluation rules: 
+</div>
+<div class="code">
+<span class="id" title="keyword">Inductive</span> <a id="TypedArithExpr.step" class="idref" href="#TypedArithExpr.step"><span class="id" title="definition, inductive"><span id="TypedArithExpr.step_ind" class="id"><span id="TypedArithExpr.step_sind" class="id">step</span></span></span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.E_IfTrue" class="idref" href="#TypedArithExpr.E_IfTrue"><span class="id" title="constructor">E_IfTrue</span></a> (<a id="t2:16" class="idref" href="#t2:16"><span class="id" title="binder">t2</span></a> <a id="t3:17" class="idref" href="#t3:17"><span class="id" title="binder">t3</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_if"><span class="id" title="constructor">tm_if</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_true"><span class="id" title="constructor">tm_true</span></a> <a class="idref" href="TAPL.ArithExpr.html#t2:16"><span class="id" title="variable">t2</span></a> <a class="idref" href="TAPL.ArithExpr.html#t3:17"><span class="id" title="variable">t3</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#t2:16"><span class="id" title="variable">t2</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.E_IfFalse" class="idref" href="#TypedArithExpr.E_IfFalse"><span class="id" title="constructor">E_IfFalse</span></a> (<a id="t2:18" class="idref" href="#t2:18"><span class="id" title="binder">t2</span></a> <a id="t3:19" class="idref" href="#t3:19"><span class="id" title="binder">t3</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_if"><span class="id" title="constructor">tm_if</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_false"><span class="id" title="constructor">tm_false</span></a> <a class="idref" href="TAPL.ArithExpr.html#t2:18"><span class="id" title="variable">t2</span></a> <a class="idref" href="TAPL.ArithExpr.html#t3:19"><span class="id" title="variable">t3</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#t3:19"><span class="id" title="variable">t3</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.E_If" class="idref" href="#TypedArithExpr.E_If"><span class="id" title="constructor">E_If</span></a> (<a id="t1:20" class="idref" href="#t1:20"><span class="id" title="binder">t1</span></a> <a id="t1':21" class="idref" href="#t1':21"><span class="id" title="binder">t1'</span></a> <a id="t2:22" class="idref" href="#t2:22"><span class="id" title="binder">t2</span></a> <a id="t3:23" class="idref" href="#t3:23"><span class="id" title="binder">t3</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t1:20"><span class="id" title="variable">t1</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#t1':21"><span class="id" title="variable">t1'</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_if"><span class="id" title="constructor">tm_if</span></a> <a class="idref" href="TAPL.ArithExpr.html#t1:20"><span class="id" title="variable">t1</span></a> <a class="idref" href="TAPL.ArithExpr.html#t2:22"><span class="id" title="variable">t2</span></a> <a class="idref" href="TAPL.ArithExpr.html#t3:23"><span class="id" title="variable">t3</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_if"><span class="id" title="constructor">tm_if</span></a> <a class="idref" href="TAPL.ArithExpr.html#t1':21"><span class="id" title="variable">t1'</span></a> <a class="idref" href="TAPL.ArithExpr.html#t2:22"><span class="id" title="variable">t2</span></a> <a class="idref" href="TAPL.ArithExpr.html#t3:23"><span class="id" title="variable">t3</span></a><br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.E_Succ" class="idref" href="#TypedArithExpr.E_Succ"><span class="id" title="constructor">E_Succ</span></a> (<a id="t:24" class="idref" href="#t:24"><span class="id" title="binder">t</span></a> <a id="t':25" class="idref" href="#t':25"><span class="id" title="binder">t'</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t:24"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#t':25"><span class="id" title="variable">t'</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:24"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> <a class="idref" href="TAPL.ArithExpr.html#t':25"><span class="id" title="variable">t'</span></a><br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.E_PredZero" class="idref" href="#TypedArithExpr.E_PredZero"><span class="id" title="constructor">E_PredZero</span></a> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_pred"><span class="id" title="constructor">tm_pred</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_zero"><span class="id" title="constructor">tm_zero</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_zero"><span class="id" title="constructor">tm_zero</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.E_PredSucc" class="idref" href="#TypedArithExpr.E_PredSucc"><span class="id" title="constructor">E_PredSucc</span></a> (<a id="t:26" class="idref" href="#t:26"><span class="id" title="binder">t</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nv"><span class="id" title="inductive">nv</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:26"><span class="id" title="variable">t</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_pred"><span class="id" title="constructor">tm_pred</span></a> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:26"><span class="id" title="variable">t</span></a>) <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:26"><span class="id" title="variable">t</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.E_Pred" class="idref" href="#TypedArithExpr.E_Pred"><span class="id" title="constructor">E_Pred</span></a> (<a id="t:27" class="idref" href="#t:27"><span class="id" title="binder">t</span></a> <a id="t':28" class="idref" href="#t':28"><span class="id" title="binder">t'</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t:27"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#t':28"><span class="id" title="variable">t'</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_pred"><span class="id" title="constructor">tm_pred</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:27"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_pred"><span class="id" title="constructor">tm_pred</span></a> <a class="idref" href="TAPL.ArithExpr.html#t':28"><span class="id" title="variable">t'</span></a><br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.E_IszeroZero" class="idref" href="#TypedArithExpr.E_IszeroZero"><span class="id" title="constructor">E_IszeroZero</span></a> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_iszero"><span class="id" title="constructor">tm_iszero</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_zero"><span class="id" title="constructor">tm_zero</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_true"><span class="id" title="constructor">tm_true</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.E_IszeroSucc" class="idref" href="#TypedArithExpr.E_IszeroSucc"><span class="id" title="constructor">E_IszeroSucc</span></a> (<a id="t:29" class="idref" href="#t:29"><span class="id" title="binder">t</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nv"><span class="id" title="inductive">nv</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:29"><span class="id" title="variable">t</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_iszero"><span class="id" title="constructor">tm_iszero</span></a> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:29"><span class="id" title="variable">t</span></a>) <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_false"><span class="id" title="constructor">tm_false</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.E_Iszero" class="idref" href="#TypedArithExpr.E_Iszero"><span class="id" title="constructor">E_Iszero</span></a> (<a id="t:30" class="idref" href="#t:30"><span class="id" title="binder">t</span></a> <a id="t':31" class="idref" href="#t':31"><span class="id" title="binder">t'</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t:30"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#t':31"><span class="id" title="variable">t'</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_iszero"><span class="id" title="constructor">tm_iszero</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:30"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_iszero"><span class="id" title="constructor">tm_iszero</span></a> <a class="idref" href="TAPL.ArithExpr.html#t':31"><span class="id" title="variable">t'</span></a><br/>
+<br/>
+<span class="id" title="keyword">where</span> <a id="TypedArithExpr.::type_scope:x_'--&gt;'_x" class="idref" href="#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">&quot;</span></a>e '--&gt;' n" := (<a class="idref" href="TAPL.ArithExpr.html#step:15"><span class="id" title="inductive">step</span></a> <span class="id" title="var">e</span> <span class="id" title="var">n</span>) : <span class="id" title="var">type_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Constructors</span> <a class="idref" href="TAPL.ArithExpr.html#step"><span class="id" title="inductive">step</span></a> : <span class="id" title="var">core</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab7"></a><h2 class="section">Properties of Evaluation</h2>
+
+<div class="paragraph"> </div>
+
+ Values do not step. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <a id="TypedArithExpr.bvalue_is_normal_form" class="idref" href="#TypedArithExpr.bvalue_is_normal_form"><span class="id" title="lemma">bvalue_is_normal_form</span></a> : <span class="id" title="keyword">∀</span> <a id="t:32" class="idref" href="#t:32"><span class="id" title="binder">t</span></a>,<br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.bv"><span class="id" title="inductive">bv</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:32"><span class="id" title="variable">t</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="definition">normal_form</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.step"><span class="id" title="inductive">step</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:32"><span class="id" title="variable">t</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">t</span> <span class="id" title="var">Hbv</span>. <span class="id" title="tactic">unfold</span> <span class="id" title="definition">normal_form</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">Hbv</span>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="tactic">intros</span> [<span class="id" title="var">t'</span> <span class="id" title="var">Hstep</span>]. <span class="id" title="var">inv</span> <span class="id" title="var">Hstep</span>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="tactic">intros</span> [<span class="id" title="var">t'</span> <span class="id" title="var">Hstep</span>]. <span class="id" title="var">inv</span> <span class="id" title="var">Hstep</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Natural number values do not step. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <a id="TypedArithExpr.nvalue_is_normal_form" class="idref" href="#TypedArithExpr.nvalue_is_normal_form"><span class="id" title="lemma">nvalue_is_normal_form</span></a> : <span class="id" title="keyword">∀</span> <a id="t:33" class="idref" href="#t:33"><span class="id" title="binder">t</span></a>,<br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nv"><span class="id" title="inductive">nv</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:33"><span class="id" title="variable">t</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="definition">normal_form</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.step"><span class="id" title="inductive">step</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:33"><span class="id" title="variable">t</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">t</span> <span class="id" title="var">Hnv</span>. <span class="id" title="tactic">unfold</span> <span class="id" title="definition">normal_form</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">Hnv</span>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="tactic">intros</span> [<span class="id" title="var">t'</span> <span class="id" title="var">Hstep</span>]. <span class="id" title="var">inv</span> <span class="id" title="var">Hstep</span>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="tactic">intros</span> [<span class="id" title="var">t'</span> <span class="id" title="var">Hstep</span>]. <span class="id" title="var">inv</span> <span class="id" title="var">Hstep</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">apply</span> <span class="id" title="var">IHHnv</span>. <span class="id" title="tactic">∃</span> <span class="id" title="var">t'0</span>. <span class="id" title="tactic">exact</span> <span class="id" title="var">H0</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+All values are normal forms. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <a id="TypedArithExpr.value_is_normal_form" class="idref" href="#TypedArithExpr.value_is_normal_form"><span class="id" title="lemma">value_is_normal_form</span></a> : <span class="id" title="keyword">∀</span> <a id="t:34" class="idref" href="#t:34"><span class="id" title="binder">t</span></a>,<br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.value"><span class="id" title="inductive">value</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:34"><span class="id" title="variable">t</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="definition">normal_form</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.step"><span class="id" title="inductive">step</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:34"><span class="id" title="variable">t</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">t</span> <span class="id" title="var">Hval</span>. <span class="id" title="tactic">unfold</span> <span class="id" title="definition">normal_form</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">destruct</span> <span class="id" title="var">Hval</span> <span class="id" title="keyword">as</span> [<span class="id" title="var">t</span> <span class="id" title="var">Hbv</span> | <span class="id" title="var">t</span> <span class="id" title="var">Hnv</span>].<br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.bvalue_is_normal_form"><span class="id" title="lemma">bvalue_is_normal_form</span></a>. <span class="id" title="tactic">exact</span> <span class="id" title="var">Hbv</span>.<br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nvalue_is_normal_form"><span class="id" title="lemma">nvalue_is_normal_form</span></a>. <span class="id" title="tactic">exact</span> <span class="id" title="var">Hnv</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Evaluation is deterministic: if a term can step to two different terms,
+    they must be the same. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Theorem</span> <a id="TypedArithExpr.step_deterministic" class="idref" href="#TypedArithExpr.step_deterministic"><span class="id" title="lemma">step_deterministic</span></a> : <span class="id" title="definition">deterministic</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.step"><span class="id" title="inductive">step</span></a>.<br/>
+<span class="id" title="keyword">Proof</span> <span class="id" title="keyword">with</span> <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">unfold</span> <span class="id" title="definition">deterministic</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">t</span> <span class="id" title="var">t1</span> <span class="id" title="var">t2</span> <span class="id" title="var">Hstep1</span> <span class="id" title="var">Hstep2</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">generalize</span> <span class="id" title="tactic">dependent</span> <span class="id" title="var">t2</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">Hstep1</span>; <span class="id" title="tactic">intros</span> <span class="id" title="var">t_</span> <span class="id" title="var">Hstep_</span>; <span class="id" title="var">inv</span> <span class="id" title="var">Hstep_</span>; <span class="id" title="tactic">try</span> (<span class="id" title="var">solve_by_invert</span>)...<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">f_equal</span>. <span class="id" title="tactic">apply</span> <span class="id" title="var">IHHstep1</span>. <span class="id" title="tactic">exact</span> <span class="id" title="var">H3</span>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">f_equal</span>. <span class="id" title="tactic">apply</span> <span class="id" title="var">IHHstep1</span>. <span class="id" title="tactic">exact</span> <span class="id" title="var">H0</span>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inv</span> <span class="id" title="var">H1</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nvalue_is_normal_form"><span class="id" title="lemma">nvalue_is_normal_form</span></a> <span class="id" title="tactic">in</span> <span class="id" title="var">H</span>. <span class="id" title="tactic">unfold</span> <span class="id" title="definition">normal_form</span> <span class="id" title="tactic">in</span> <span class="id" title="var">H</span>. <span class="id" title="var">solve_exists_contradiction</span>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inv</span> <span class="id" title="var">Hstep1</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nvalue_is_normal_form"><span class="id" title="lemma">nvalue_is_normal_form</span></a> <span class="id" title="tactic">in</span> <span class="id" title="var">H0</span>. <span class="id" title="tactic">unfold</span> <span class="id" title="definition">normal_form</span> <span class="id" title="tactic">in</span> <span class="id" title="var">H0</span>. <span class="id" title="var">solve_exists_contradiction</span>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">f_equal</span>. <span class="id" title="tactic">apply</span> <span class="id" title="var">IHHstep1</span>. <span class="id" title="tactic">exact</span> <span class="id" title="var">H0</span>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inv</span> <span class="id" title="var">H1</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nvalue_is_normal_form"><span class="id" title="lemma">nvalue_is_normal_form</span></a> <span class="id" title="tactic">in</span> <span class="id" title="var">H</span>. <span class="id" title="tactic">unfold</span> <span class="id" title="definition">normal_form</span> <span class="id" title="tactic">in</span> <span class="id" title="var">H</span>. <span class="id" title="var">solve_exists_contradiction</span>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">inv</span> <span class="id" title="var">Hstep1</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nvalue_is_normal_form"><span class="id" title="lemma">nvalue_is_normal_form</span></a> <span class="id" title="tactic">in</span> <span class="id" title="var">H0</span>. <span class="id" title="tactic">unfold</span> <span class="id" title="definition">normal_form</span> <span class="id" title="tactic">in</span> <span class="id" title="var">H0</span>. <span class="id" title="var">solve_exists_contradiction</span>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">f_equal</span>. <span class="id" title="tactic">apply</span> <span class="id" title="var">IHHstep1</span>. <span class="id" title="tactic">exact</span> <span class="id" title="var">H0</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+</div>
+
+<div class="doc">
+<a id="lab8"></a><h2 class="section">Multi-step Evaluation</h2>
+
+</div>
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab9"></a><h2 class="section">Multi-step Evaluation</h2>
+
+<div class="paragraph"> </div>
+
+ The reflexive-transitive closure of <span class="inlinecode"><span class="id" title="var">step</span></span> 
+</div>
+<div class="code">
+<span class="id" title="keyword">Notation</span> <a id="20706ac09abd090ddd0831a3b31590d4" class="idref" href="#20706ac09abd090ddd0831a3b31590d4"><span class="id" title="notation">&quot;</span></a>t '--&gt;*' t'" := (<span class="id" title="inductive">multi</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.step"><span class="id" title="inductive">step</span></a> <span class="id" title="var">t</span> <span class="id" title="var">t'</span>) (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 40).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Example: multiple evaluation steps 
+</div>
+<div class="code">
+<span class="id" title="keyword">Example</span> <a id="TypedArithExpr.test_multi_step" class="idref" href="#TypedArithExpr.test_multi_step"><span class="id" title="definition">test_multi_step</span></a> :<br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_if"><span class="id" title="constructor">tm_if</span></a> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_if"><span class="id" title="constructor">tm_if</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_true"><span class="id" title="constructor">tm_true</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_false"><span class="id" title="constructor">tm_false</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_true"><span class="id" title="constructor">tm_true</span></a>) <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_true"><span class="id" title="constructor">tm_true</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_false"><span class="id" title="constructor">tm_false</span></a> <a class="idref" href="TAPL.ArithExpr.html#20706ac09abd090ddd0831a3b31590d4"><span class="id" title="notation">--&gt;*</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_false"><span class="id" title="constructor">tm_false</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <span class="id" title="constructor">multi_step</span> <span class="id" title="keyword">with</span> (<span class="id" title="var">y</span> := <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_if"><span class="id" title="constructor">tm_if</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_false"><span class="id" title="constructor">tm_false</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_true"><span class="id" title="constructor">tm_true</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_false"><span class="id" title="constructor">tm_false</span></a>).<br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.E_If"><span class="id" title="constructor">E_If</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.E_IfTrue"><span class="id" title="constructor">E_IfTrue</span></a>.<br/>
+&nbsp;&nbsp;- <span class="id" title="tactic">apply</span> <span class="id" title="constructor">multi_step</span> <span class="id" title="keyword">with</span> (<span class="id" title="var">y</span> := <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_false"><span class="id" title="constructor">tm_false</span></a>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.E_IfFalse"><span class="id" title="constructor">E_IfFalse</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">apply</span> <span class="id" title="constructor">multi_refl</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Another example 
+</div>
+<div class="code">
+<span class="id" title="keyword">Example</span> <a id="TypedArithExpr.test_multi_step2" class="idref" href="#TypedArithExpr.test_multi_step2"><span class="id" title="definition">test_multi_step2</span></a> :<br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_zero"><span class="id" title="constructor">tm_zero</span></a>) <a class="idref" href="TAPL.ArithExpr.html#20706ac09abd090ddd0831a3b31590d4"><span class="id" title="notation">--&gt;*</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_zero"><span class="id" title="constructor">tm_zero</span></a>).<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <span class="id" title="constructor">multi_refl</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab10"></a><h2 class="section">Big-step Evaluation</h2>
+
+<div class="paragraph"> </div>
+
+ An alternative to small-step evaluation is big-step or natural
+    semantics. In big-step evaluation, we define what it means for a
+    term to evaluate to a final value directly, without necessarily
+    going through intermediate steps.
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Reserved Notation</span> &quot;t '==&gt;' v" (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 90, <span class="id" title="tactic">left</span> <span class="id" title="keyword">associativity</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Big-step evaluation rules: 
+</div>
+<div class="code">
+<span class="id" title="keyword">Inductive</span> <a id="TypedArithExpr.eval" class="idref" href="#TypedArithExpr.eval"><span class="id" title="definition, inductive"><span id="TypedArithExpr.eval_ind" class="id"><span id="TypedArithExpr.eval_sind" class="id">eval</span></span></span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.B_Value" class="idref" href="#TypedArithExpr.B_Value"><span class="id" title="constructor">B_Value</span></a> (<a id="v:37" class="idref" href="#v:37"><span class="id" title="binder">v</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.value"><span class="id" title="inductive">value</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:37"><span class="id" title="variable">v</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#v:37"><span class="id" title="variable">v</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:37"><span class="id" title="variable">v</span></a><br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.B_IfTrue" class="idref" href="#TypedArithExpr.B_IfTrue"><span class="id" title="constructor">B_IfTrue</span></a> (<a id="t1:38" class="idref" href="#t1:38"><span class="id" title="binder">t1</span></a> <a id="t2:39" class="idref" href="#t2:39"><span class="id" title="binder">t2</span></a> <a id="t3:40" class="idref" href="#t3:40"><span class="id" title="binder">t3</span></a> <a id="v:41" class="idref" href="#v:41"><span class="id" title="binder">v</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t1:38"><span class="id" title="variable">t1</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_true"><span class="id" title="constructor">tm_true</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t2:39"><span class="id" title="variable">t2</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:41"><span class="id" title="variable">v</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_if"><span class="id" title="constructor">tm_if</span></a> <a class="idref" href="TAPL.ArithExpr.html#t1:38"><span class="id" title="variable">t1</span></a> <a class="idref" href="TAPL.ArithExpr.html#t2:39"><span class="id" title="variable">t2</span></a> <a class="idref" href="TAPL.ArithExpr.html#t3:40"><span class="id" title="variable">t3</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:41"><span class="id" title="variable">v</span></a><br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.B_IfFalse" class="idref" href="#TypedArithExpr.B_IfFalse"><span class="id" title="constructor">B_IfFalse</span></a> (<a id="t1:42" class="idref" href="#t1:42"><span class="id" title="binder">t1</span></a> <a id="t2:43" class="idref" href="#t2:43"><span class="id" title="binder">t2</span></a> <a id="t3:44" class="idref" href="#t3:44"><span class="id" title="binder">t3</span></a> <a id="v:45" class="idref" href="#v:45"><span class="id" title="binder">v</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t1:42"><span class="id" title="variable">t1</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_false"><span class="id" title="constructor">tm_false</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t3:44"><span class="id" title="variable">t3</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:45"><span class="id" title="variable">v</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_if"><span class="id" title="constructor">tm_if</span></a> <a class="idref" href="TAPL.ArithExpr.html#t1:42"><span class="id" title="variable">t1</span></a> <a class="idref" href="TAPL.ArithExpr.html#t2:43"><span class="id" title="variable">t2</span></a> <a class="idref" href="TAPL.ArithExpr.html#t3:44"><span class="id" title="variable">t3</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:45"><span class="id" title="variable">v</span></a><br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.B_Succ" class="idref" href="#TypedArithExpr.B_Succ"><span class="id" title="constructor">B_Succ</span></a> (<a id="t:46" class="idref" href="#t:46"><span class="id" title="binder">t</span></a> <a id="v:47" class="idref" href="#v:47"><span class="id" title="binder">v</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t:46"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:47"><span class="id" title="variable">v</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nv"><span class="id" title="inductive">nv</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:47"><span class="id" title="variable">v</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:46"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:47"><span class="id" title="variable">v</span></a><br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.B_PredZero" class="idref" href="#TypedArithExpr.B_PredZero"><span class="id" title="constructor">B_PredZero</span></a> (<a id="t:48" class="idref" href="#t:48"><span class="id" title="binder">t</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t:48"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_zero"><span class="id" title="constructor">tm_zero</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_pred"><span class="id" title="constructor">tm_pred</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:48"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_zero"><span class="id" title="constructor">tm_zero</span></a><br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.B_PredSucc" class="idref" href="#TypedArithExpr.B_PredSucc"><span class="id" title="constructor">B_PredSucc</span></a> (<a id="t:49" class="idref" href="#t:49"><span class="id" title="binder">t</span></a> <a id="v:50" class="idref" href="#v:50"><span class="id" title="binder">v</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t:49"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:50"><span class="id" title="variable">v</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nv"><span class="id" title="inductive">nv</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:50"><span class="id" title="variable">v</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_pred"><span class="id" title="constructor">tm_pred</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:49"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:50"><span class="id" title="variable">v</span></a><br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.B_IszeroZero" class="idref" href="#TypedArithExpr.B_IszeroZero"><span class="id" title="constructor">B_IszeroZero</span></a> (<a id="t:51" class="idref" href="#t:51"><span class="id" title="binder">t</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t:51"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_zero"><span class="id" title="constructor">tm_zero</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_iszero"><span class="id" title="constructor">tm_iszero</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:51"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_true"><span class="id" title="constructor">tm_true</span></a><br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.B_IszeroSucc" class="idref" href="#TypedArithExpr.B_IszeroSucc"><span class="id" title="constructor">B_IszeroSucc</span></a> (<a id="t:52" class="idref" href="#t:52"><span class="id" title="binder">t</span></a> <a id="v:53" class="idref" href="#v:53"><span class="id" title="binder">v</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t:52"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:53"><span class="id" title="variable">v</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nv"><span class="id" title="inductive">nv</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:53"><span class="id" title="variable">v</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_iszero"><span class="id" title="constructor">tm_iszero</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:52"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_false"><span class="id" title="constructor">tm_false</span></a><br/>
+<br/>
+<span class="id" title="keyword">where</span> <a id="f2afb2a33dcbf5b9ed583b81bccb7716" class="idref" href="#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">&quot;</span></a>t '==&gt;' v" := (<a class="idref" href="TAPL.ArithExpr.html#eval:36"><span class="id" title="inductive">eval</span></a> <span class="id" title="var">t</span> <span class="id" title="var">v</span>) : <span class="id" title="var">type_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Constructors</span> <a class="idref" href="TAPL.ArithExpr.html#eval"><span class="id" title="inductive">eval</span></a> : <span class="id" title="var">core</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab11"></a><h2 class="section">Relationship between Big-step and Small-step</h2>
+
+<div class="paragraph"> </div>
+
+ Small-step evaluation reaches a value if and only if big-step evaluation
+    produces that value. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a id="TypedArithExpr.eval_one_step" class="idref" href="#TypedArithExpr.eval_one_step"><span class="id" title="lemma">eval_one_step</span></a>: <span class="id" title="keyword">∀</span> <a id="x:54" class="idref" href="#x:54"><span class="id" title="binder">x</span></a> <a id="y:55" class="idref" href="#y:55"><span class="id" title="binder">y</span></a> <a id="z:56" class="idref" href="#z:56"><span class="id" title="binder">z</span></a>,<br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.value"><span class="id" title="inductive">value</span></a> <a class="idref" href="TAPL.ArithExpr.html#z:56"><span class="id" title="variable">z</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#x:54"><span class="id" title="variable">x</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#y:55"><span class="id" title="variable">y</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#y:55"><span class="id" title="variable">y</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#z:56"><span class="id" title="variable">z</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#x:54"><span class="id" title="variable">x</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#z:56"><span class="id" title="variable">z</span></a>.<br/>
+<span class="id" title="keyword">Proof</span> <span class="id" title="keyword">with</span> <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> <span class="id" title="var">z</span> <span class="id" title="var">Hval</span> <span class="id" title="var">Hstep</span> <span class="id" title="var">Heval</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">generalize</span> <span class="id" title="tactic">dependent</span> <span class="id" title="var">z</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">Hstep</span>; <span class="id" title="tactic">intros</span> <span class="id" title="var">z</span> <span class="id" title="var">Hval</span> <span class="id" title="var">Heval</span>; (<span class="id" title="tactic">try</span> <span class="id" title="var">solve_by_invert</span>)...<br/>
+<span class="id" title="var">Admitted</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a id="TypedArithExpr.eval_from_steps" class="idref" href="#TypedArithExpr.eval_from_steps"><span class="id" title="lemma">eval_from_steps</span></a> : <span class="id" title="keyword">∀</span> <a id="t:57" class="idref" href="#t:57"><span class="id" title="binder">t</span></a> <a id="v:58" class="idref" href="#v:58"><span class="id" title="binder">v</span></a>,<br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t:57"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#20706ac09abd090ddd0831a3b31590d4"><span class="id" title="notation">--&gt;*</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:58"><span class="id" title="variable">v</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.value"><span class="id" title="inductive">value</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:58"><span class="id" title="variable">v</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t:57"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:58"><span class="id" title="variable">v</span></a>.<br/>
+<span class="id" title="keyword">Proof</span> <span class="id" title="keyword">with</span> <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">t</span> <span class="id" title="var">v</span> <span class="id" title="var">Hmulti</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">Hmulti</span>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.B_Value"><span class="id" title="constructor">B_Value</span></a>. <span class="id" title="tactic">exact</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <span class="id" title="var">IHHmulti</span> <span class="id" title="tactic">in</span> <span class="id" title="var">Hval</span>.<br/>
+<span class="id" title="var">Admitted</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a id="TypedArithExpr.eval_iff_steps" class="idref" href="#TypedArithExpr.eval_iff_steps"><span class="id" title="lemma">eval_iff_steps</span></a> : <span class="id" title="keyword">∀</span> <a id="t:59" class="idref" href="#t:59"><span class="id" title="binder">t</span></a> <a id="v:60" class="idref" href="#v:60"><span class="id" title="binder">v</span></a>,<br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.value"><span class="id" title="inductive">value</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:60"><span class="id" title="variable">v</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'&lt;-&gt;'_x"><span class="id" title="notation">(</span></a><a class="idref" href="TAPL.ArithExpr.html#t:59"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#f2afb2a33dcbf5b9ed583b81bccb7716"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:60"><span class="id" title="variable">v</span></a><a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'&lt;-&gt;'_x"><span class="id" title="notation">)</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'&lt;-&gt;'_x"><span class="id" title="notation">↔</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'&lt;-&gt;'_x"><span class="id" title="notation">(</span></a><a class="idref" href="TAPL.ArithExpr.html#t:59"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#20706ac09abd090ddd0831a3b31590d4"><span class="id" title="notation">--&gt;*</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:60"><span class="id" title="variable">v</span></a><a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'&lt;-&gt;'_x"><span class="id" title="notation">)</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+
+<br/>
+<span class="id" title="var">Admitted</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a id="TypedArithExpr.nf_multi_step" class="idref" href="#TypedArithExpr.nf_multi_step"><span class="id" title="lemma">nf_multi_step</span></a>: <span class="id" title="keyword">∀</span> <a id="t:61" class="idref" href="#t:61"><span class="id" title="binder">t</span></a> <a id="v:62" class="idref" href="#v:62"><span class="id" title="binder">v</span></a>,<br/>
+&nbsp;&nbsp;<span class="id" title="definition">normal_form</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.step"><span class="id" title="inductive">step</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:61"><span class="id" title="variable">t</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t:61"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#20706ac09abd090ddd0831a3b31590d4"><span class="id" title="notation">--&gt;*</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:62"><span class="id" title="variable">v</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t:61"><span class="id" title="variable">t</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#6cd0f7b28b6092304087c7049437bb1a"><span class="id" title="notation">=</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:62"><span class="id" title="variable">v</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+<span class="id" title="var">Admitted</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab12"></a><h2 class="section">Type Checking</h2>
+
+<div class="paragraph"> </div>
+
+ Now we add typing to this language. 
+</div>
+<div class="code">
+<span class="id" title="var">Declare</span> <span class="id" title="var">Custom</span> <span class="id" title="var">Entry</span> <span class="id" title="var">arith_tm</span>.<br/>
+<span class="id" title="var">Declare</span> <span class="id" title="var">Custom</span> <span class="id" title="var">Entry</span> <span class="id" title="var">arith_ty</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a id="dcf3e6e33011c7bf8a18c3b7a46726b0" class="idref" href="#dcf3e6e33011c7bf8a18c3b7a46726b0"><span class="id" title="notation">&quot;</span></a>&lt;{ e }&gt;" := <span class="id" title="var">e</span> (<span class="id" title="var">e</span> <span class="id" title="var">custom</span> <span class="id" title="var">arith_tm</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 200) : <span class="id" title="var">type_scope</span>.<br/>
+<span class="id" title="keyword">Notation</span> <a id="TypedArithExpr.:arith_tm:type_scope:x" class="idref" href="#TypedArithExpr.:arith_tm:type_scope:x"><span class="id" title="notation">&quot;</span></a>t" := <span class="id" title="var">t</span> (<span class="id" title="tactic">in</span> <span class="id" title="var">custom</span> <span class="id" title="var">arith_tm</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0, <span class="id" title="var">t</span> <span class="id" title="keyword">constr</span>) : <span class="id" title="var">type_scope</span>.<br/>
+<span class="id" title="keyword">Notation</span> <a id="TypedArithExpr.:arith_ty:type_scope:x" class="idref" href="#TypedArithExpr.:arith_ty:type_scope:x"><span class="id" title="notation">&quot;</span></a>T" := <span class="id" title="var">T</span> (<span class="id" title="tactic">in</span> <span class="id" title="var">custom</span> <span class="id" title="var">arith_ty</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0, <span class="id" title="var">T</span> <span class="id" title="keyword">constr</span>) : <span class="id" title="var">type_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a id="TypedArithExpr.:arith_ty:type_scope:'Bool'" class="idref" href="#TypedArithExpr.:arith_ty:type_scope:'Bool'"><span class="id" title="notation">&quot;</span></a>'Bool'" := <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.Ty_Bool"><span class="id" title="constructor">Ty_Bool</span></a> (<span class="id" title="tactic">in</span> <span class="id" title="var">custom</span> <span class="id" title="var">arith_ty</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0) : <span class="id" title="var">type_scope</span>.<br/>
+<span class="id" title="keyword">Notation</span> <a id="TypedArithExpr.:arith_ty:type_scope:'Nat'" class="idref" href="#TypedArithExpr.:arith_ty:type_scope:'Nat'"><span class="id" title="notation">&quot;</span></a>'Nat'"  := <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.Ty_Nat"><span class="id" title="constructor">Ty_Nat</span></a> (<span class="id" title="tactic">in</span> <span class="id" title="var">custom</span> <span class="id" title="var">arith_ty</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 0) : <span class="id" title="var">type_scope</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Typing rules:
+<ul class="doclist">
+<li> <span class="inlinecode"><span class="id" title="var">true</span></span> and <span class="inlinecode"><span class="id" title="var">false</span></span> have type <span class="inlinecode"><span class="id" title="var">Ty_Bool</span></span>
+
+</li>
+<li> <span class="inlinecode"><span class="id" title="keyword">if</span></span> expressions have type <span class="inlinecode"><span class="id" title="var">T</span></span> if condition is <span class="inlinecode"><span class="id" title="var">Ty_Bool</span></span>
+      and both branches have type <span class="inlinecode"><span class="id" title="var">T</span></span>
+
+</li>
+<li> <span class="inlinecode"><span class="id" title="var">zero</span></span> has type <span class="inlinecode"><span class="id" title="var">Ty_Nat</span></span>
+
+</li>
+<li> <span class="inlinecode"><span class="id" title="var">succ</span></span> and <span class="inlinecode"><span class="id" title="var">pred</span></span> work on <span class="inlinecode"><span class="id" title="var">Ty_Nat</span></span>
+
+</li>
+<li> <span class="inlinecode"><span class="id" title="var">iszero</span></span> produces <span class="inlinecode"><span class="id" title="var">Ty_Bool</span></span>
+
+</li>
+</ul>
+
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Inductive</span> <a id="TypedArithExpr.has_type" class="idref" href="#TypedArithExpr.has_type"><span class="id" title="definition, inductive"><span id="TypedArithExpr.has_type_ind" class="id"><span id="TypedArithExpr.has_type_sind" class="id">has_type</span></span></span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.ty"><span class="id" title="inductive">ty</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.T_True" class="idref" href="#TypedArithExpr.T_True"><span class="id" title="constructor">T_True</span></a> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#has_type:63"><span class="id" title="inductive">has_type</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_true"><span class="id" title="constructor">tm_true</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.Ty_Bool"><span class="id" title="constructor">Ty_Bool</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.T_False" class="idref" href="#TypedArithExpr.T_False"><span class="id" title="constructor">T_False</span></a> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#has_type:63"><span class="id" title="inductive">has_type</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_false"><span class="id" title="constructor">tm_false</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.Ty_Bool"><span class="id" title="constructor">Ty_Bool</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.T_If" class="idref" href="#TypedArithExpr.T_If"><span class="id" title="constructor">T_If</span></a> (<a id="t1:65" class="idref" href="#t1:65"><span class="id" title="binder">t1</span></a> <a id="t2:66" class="idref" href="#t2:66"><span class="id" title="binder">t2</span></a> <a id="t3:67" class="idref" href="#t3:67"><span class="id" title="binder">t3</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) (<a id="T:68" class="idref" href="#T:68"><span class="id" title="binder">T</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.ty"><span class="id" title="inductive">ty</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#has_type:63"><span class="id" title="inductive">has_type</span></a> <a class="idref" href="TAPL.ArithExpr.html#t1:65"><span class="id" title="variable">t1</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.Ty_Bool"><span class="id" title="constructor">Ty_Bool</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#has_type:63"><span class="id" title="inductive">has_type</span></a> <a class="idref" href="TAPL.ArithExpr.html#t2:66"><span class="id" title="variable">t2</span></a> <a class="idref" href="TAPL.ArithExpr.html#T:68"><span class="id" title="variable">T</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#has_type:63"><span class="id" title="inductive">has_type</span></a> <a class="idref" href="TAPL.ArithExpr.html#t3:67"><span class="id" title="variable">t3</span></a> <a class="idref" href="TAPL.ArithExpr.html#T:68"><span class="id" title="variable">T</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#has_type:63"><span class="id" title="inductive">has_type</span></a> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_if"><span class="id" title="constructor">tm_if</span></a> <a class="idref" href="TAPL.ArithExpr.html#t1:65"><span class="id" title="variable">t1</span></a> <a class="idref" href="TAPL.ArithExpr.html#t2:66"><span class="id" title="variable">t2</span></a> <a class="idref" href="TAPL.ArithExpr.html#t3:67"><span class="id" title="variable">t3</span></a>) <a class="idref" href="TAPL.ArithExpr.html#T:68"><span class="id" title="variable">T</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.T_Zero" class="idref" href="#TypedArithExpr.T_Zero"><span class="id" title="constructor">T_Zero</span></a> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#has_type:63"><span class="id" title="inductive">has_type</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_zero"><span class="id" title="constructor">tm_zero</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.Ty_Nat"><span class="id" title="constructor">Ty_Nat</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.T_Succ" class="idref" href="#TypedArithExpr.T_Succ"><span class="id" title="constructor">T_Succ</span></a> (<a id="t:69" class="idref" href="#t:69"><span class="id" title="binder">t</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#has_type:63"><span class="id" title="inductive">has_type</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:69"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.Ty_Nat"><span class="id" title="constructor">Ty_Nat</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#has_type:63"><span class="id" title="inductive">has_type</span></a> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:69"><span class="id" title="variable">t</span></a>) <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.Ty_Nat"><span class="id" title="constructor">Ty_Nat</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.T_Pred" class="idref" href="#TypedArithExpr.T_Pred"><span class="id" title="constructor">T_Pred</span></a> (<a id="t:70" class="idref" href="#t:70"><span class="id" title="binder">t</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#has_type:63"><span class="id" title="inductive">has_type</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:70"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.Ty_Nat"><span class="id" title="constructor">Ty_Nat</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#has_type:63"><span class="id" title="inductive">has_type</span></a> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_pred"><span class="id" title="constructor">tm_pred</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:70"><span class="id" title="variable">t</span></a>) <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.Ty_Nat"><span class="id" title="constructor">Ty_Nat</span></a><br/>
+&nbsp;&nbsp;| <a id="TypedArithExpr.T_Iszero" class="idref" href="#TypedArithExpr.T_Iszero"><span class="id" title="constructor">T_Iszero</span></a> (<a id="t:71" class="idref" href="#t:71"><span class="id" title="binder">t</span></a> : <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm"><span class="id" title="inductive">tm</span></a>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#has_type:63"><span class="id" title="inductive">has_type</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:71"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.Ty_Nat"><span class="id" title="constructor">Ty_Nat</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#has_type:63"><span class="id" title="inductive">has_type</span></a> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_iszero"><span class="id" title="constructor">tm_iszero</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:71"><span class="id" title="variable">t</span></a>) <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.Ty_Bool"><span class="id" title="constructor">Ty_Bool</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Notation</span> <a id="3e9844b2236e1015bc405e9af5b3de26" class="idref" href="#3e9844b2236e1015bc405e9af5b3de26"><span class="id" title="notation">&quot;</span></a>t '\in' T" := (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.has_type"><span class="id" title="inductive">has_type</span></a> <span class="id" title="var">t</span> <span class="id" title="var">T</span>) <br/>
+&nbsp;&nbsp;(<span class="id" title="tactic">in</span> <span class="id" title="var">custom</span> <span class="id" title="var">arith_tm</span> <span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 100, <span class="id" title="var">t</span> <span class="id" title="var">custom</span> <span class="id" title="var">arith_tm</span>, <span class="id" title="var">T</span> <span class="id" title="var">custom</span> <span class="id" title="var">arith_ty</span>) : <span class="id" title="var">type_scope</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Hint Constructors</span> <a class="idref" href="TAPL.ArithExpr.html#has_type"><span class="id" title="inductive">has_type</span></a> : <span class="id" title="var">core</span>.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a id="TypedArithExpr.has_type_deterministic" class="idref" href="#TypedArithExpr.has_type_deterministic"><span class="id" title="lemma">has_type_deterministic</span></a>:<br/>
+&nbsp;&nbsp;<span class="id" title="definition">deterministic</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.has_type"><span class="id" title="inductive">has_type</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">unfold</span> <span class="id" title="definition">deterministic</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">t</span> <span class="id" title="var">T1</span> <span class="id" title="var">T2</span> <span class="id" title="var">H1</span> <span class="id" title="var">H2</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">generalize</span> <span class="id" title="tactic">dependent</span> <span class="id" title="var">T2</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">H1</span>; <span class="id" title="tactic">intros</span> <span class="id" title="var">T2</span> <span class="id" title="var">H2</span>; <span class="id" title="var">inv</span> <span class="id" title="var">H2</span>; <span class="id" title="tactic">try</span> <span class="id" title="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <span class="id" title="var">IHhas_type2</span>. <span class="id" title="tactic">exact</span> <span class="id" title="var">H5</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a id="lab13"></a><h2 class="section">Type Safety: Type Preservation and Progress</h2>
+
+<div class="paragraph"> </div>
+
+ Type preservation: if a well-typed term takes a step, the result is also well-typed with the same type. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a id="TypedArithExpr.preservation" class="idref" href="#TypedArithExpr.preservation"><span class="id" title="lemma">preservation</span></a> : <span class="id" title="keyword">∀</span> <a id="t:72" class="idref" href="#t:72"><span class="id" title="binder">t</span></a> <a id="t':73" class="idref" href="#t':73"><span class="id" title="binder">t'</span></a> <a id="T:74" class="idref" href="#T:74"><span class="id" title="binder">T</span></a>,<br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#dcf3e6e33011c7bf8a18c3b7a46726b0"><span class="id" title="notation">&lt;{</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:72"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#3e9844b2236e1015bc405e9af5b3de26"><span class="id" title="notation">\</span></a><a class="idref" href="TAPL.ArithExpr.html#3e9844b2236e1015bc405e9af5b3de26"><span class="id" title="notation">in</span></a> <a class="idref" href="TAPL.ArithExpr.html#T:74"><span class="id" title="variable">T</span></a> <a class="idref" href="TAPL.ArithExpr.html#dcf3e6e33011c7bf8a18c3b7a46726b0"><span class="id" title="notation">}&gt;</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#t:72"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#t':73"><span class="id" title="variable">t'</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#dcf3e6e33011c7bf8a18c3b7a46726b0"><span class="id" title="notation">&lt;{</span></a> <a class="idref" href="TAPL.ArithExpr.html#t':73"><span class="id" title="variable">t'</span></a> <a class="idref" href="TAPL.ArithExpr.html#3e9844b2236e1015bc405e9af5b3de26"><span class="id" title="notation">\</span></a><a class="idref" href="TAPL.ArithExpr.html#3e9844b2236e1015bc405e9af5b3de26"><span class="id" title="notation">in</span></a> <a class="idref" href="TAPL.ArithExpr.html#T:74"><span class="id" title="variable">T</span></a> <a class="idref" href="TAPL.ArithExpr.html#dcf3e6e33011c7bf8a18c3b7a46726b0"><span class="id" title="notation">}&gt;</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">t</span> <span class="id" title="var">t'</span> <span class="id" title="var">T</span> <span class="id" title="var">HT</span> <span class="id" title="var">Hstep</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">generalize</span> <span class="id" title="tactic">dependent</span> <span class="id" title="var">T</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">Hstep</span>; <span class="id" title="tactic">intros</span> <span class="id" title="var">T</span> <span class="id" title="var">HT</span>; <span class="id" title="var">inv</span> <span class="id" title="var">HT</span>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="tactic">exact</span> <span class="id" title="var">H4</span>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="tactic">exact</span> <span class="id" title="var">H5</span>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.T_If"><span class="id" title="constructor">T_If</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">exact</span> (<span class="id" title="var">IHHstep</span> <span class="id" title="var">_</span> <span class="id" title="var">H2</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">exact</span> <span class="id" title="var">H4</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">exact</span> <span class="id" title="var">H5</span>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.T_Succ"><span class="id" title="constructor">T_Succ</span></a>. <span class="id" title="tactic">apply</span> <span class="id" title="var">IHHstep</span>. <span class="id" title="tactic">assumption</span>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.T_Zero"><span class="id" title="constructor">T_Zero</span></a>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="var">inv</span> <span class="id" title="var">H1</span>. <span class="id" title="tactic">assumption</span>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.T_Pred"><span class="id" title="constructor">T_Pred</span></a>. <span class="id" title="tactic">apply</span> <span class="id" title="var">IHHstep</span>. <span class="id" title="tactic">assumption</span>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.T_True"><span class="id" title="constructor">T_True</span></a>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.T_False"><span class="id" title="constructor">T_False</span></a>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.T_Iszero"><span class="id" title="constructor">T_Iszero</span></a>. <span class="id" title="tactic">apply</span> <span class="id" title="var">IHHstep</span>. <span class="id" title="tactic">assumption</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a id="TypedArithExpr.canonical_forms_bool" class="idref" href="#TypedArithExpr.canonical_forms_bool"><span class="id" title="lemma">canonical_forms_bool</span></a> : <span class="id" title="keyword">∀</span> <a id="v:75" class="idref" href="#v:75"><span class="id" title="binder">v</span></a>,<br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#dcf3e6e33011c7bf8a18c3b7a46726b0"><span class="id" title="notation">&lt;{</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:75"><span class="id" title="variable">v</span></a> <a class="idref" href="TAPL.ArithExpr.html#3e9844b2236e1015bc405e9af5b3de26"><span class="id" title="notation">\</span></a><a class="idref" href="TAPL.ArithExpr.html#3e9844b2236e1015bc405e9af5b3de26"><span class="id" title="notation">in</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.:arith_ty:type_scope:'Bool'"><span class="id" title="notation">Bool</span></a> <a class="idref" href="TAPL.ArithExpr.html#dcf3e6e33011c7bf8a18c3b7a46726b0"><span class="id" title="notation">}&gt;</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.value"><span class="id" title="inductive">value</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:75"><span class="id" title="variable">v</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.bv"><span class="id" title="inductive">bv</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:75"><span class="id" title="variable">v</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">v</span> <span class="id" title="var">HT</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">inv</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="tactic">exact</span> <span class="id" title="var">H</span>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="var">inv</span> <span class="id" title="var">HT</span>; <span class="id" title="var">inv</span> <span class="id" title="var">H</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Lemma</span> <a id="TypedArithExpr.canonical_forms_nat" class="idref" href="#TypedArithExpr.canonical_forms_nat"><span class="id" title="lemma">canonical_forms_nat</span></a> : <span class="id" title="keyword">∀</span> <a id="v:76" class="idref" href="#v:76"><span class="id" title="binder">v</span></a>,<br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#dcf3e6e33011c7bf8a18c3b7a46726b0"><span class="id" title="notation">&lt;{</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:76"><span class="id" title="variable">v</span></a> <a class="idref" href="TAPL.ArithExpr.html#3e9844b2236e1015bc405e9af5b3de26"><span class="id" title="notation">\</span></a><a class="idref" href="TAPL.ArithExpr.html#3e9844b2236e1015bc405e9af5b3de26"><span class="id" title="notation">in</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.:arith_ty:type_scope:'Nat'"><span class="id" title="notation">Nat</span></a> <a class="idref" href="TAPL.ArithExpr.html#dcf3e6e33011c7bf8a18c3b7a46726b0"><span class="id" title="notation">}&gt;</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.value"><span class="id" title="inductive">value</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:76"><span class="id" title="variable">v</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nv"><span class="id" title="inductive">nv</span></a> <a class="idref" href="TAPL.ArithExpr.html#v:76"><span class="id" title="variable">v</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">v</span> <span class="id" title="var">HT</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="var">inv</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="var">inv</span> <span class="id" title="var">HT</span>; <span class="id" title="var">inv</span> <span class="id" title="var">H</span>.<br/>
+&nbsp;&nbsp;-  <span class="id" title="tactic">exact</span> <span class="id" title="var">H</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Progress: every well-typed term either is a value or can take a step. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a id="TypedArithExpr.progress_auto" class="idref" href="#TypedArithExpr.progress_auto"><span class="id" title="lemma">progress_auto</span></a> : <span class="id" title="keyword">∀</span> <a id="t:77" class="idref" href="#t:77"><span class="id" title="binder">t</span></a> <a id="T:78" class="idref" href="#T:78"><span class="id" title="binder">T</span></a>,<br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#dcf3e6e33011c7bf8a18c3b7a46726b0"><span class="id" title="notation">&lt;{</span></a><a class="idref" href="TAPL.ArithExpr.html#t:77"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#3e9844b2236e1015bc405e9af5b3de26"><span class="id" title="notation">\</span></a><a class="idref" href="TAPL.ArithExpr.html#3e9844b2236e1015bc405e9af5b3de26"><span class="id" title="notation">in</span></a> <a class="idref" href="TAPL.ArithExpr.html#T:78"><span class="id" title="variable">T</span></a><a class="idref" href="TAPL.ArithExpr.html#dcf3e6e33011c7bf8a18c3b7a46726b0"><span class="id" title="notation">}&gt;</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.value"><span class="id" title="inductive">value</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:77"><span class="id" title="variable">t</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#f031fe1957c4a4a8e217aa46af2b4e25"><span class="id" title="notation">∨</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#a883bdd010993579f99d60b3775bcf54"><span class="id" title="notation">∃</span></a> <a id="t':79" class="idref" href="#t':79"><span class="id" title="binder">t'</span></a><a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#a883bdd010993579f99d60b3775bcf54"><span class="id" title="notation">,</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:77"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#t':79"><span class="id" title="variable">t'</span></a>.<br/>
+<span class="id" title="keyword">Proof</span> <span class="id" title="keyword">with</span> <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">t</span> <span class="id" title="var">T</span> <span class="id" title="var">HT</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">HT</span>...<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">destruct</span> <span class="id" title="var">IHHT1</span> <span class="id" title="keyword">as</span> [<span class="id" title="var">Hval</span> | [<span class="id" title="var">t1'</span> <span class="id" title="var">Hstep</span>]].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.canonical_forms_bool"><span class="id" title="lemma">canonical_forms_bool</span></a> <span class="id" title="tactic">in</span> <span class="id" title="var">Hval</span>...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">destruct</span> <span class="id" title="var">Hval</span>...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> <span class="id" title="var">t2</span>...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> <span class="id" title="var">t3</span>...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_if"><span class="id" title="constructor">tm_if</span></a> <span class="id" title="var">t1'</span> <span class="id" title="var">t2</span> <span class="id" title="var">t3</span>)...<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">destruct</span> <span class="id" title="var">IHHT</span> <span class="id" title="keyword">as</span> [<span class="id" title="var">Hval</span> | [<span class="id" title="var">t'</span> <span class="id" title="var">Hstep</span>]]...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.canonical_forms_nat"><span class="id" title="lemma">canonical_forms_nat</span></a> <span class="id" title="tactic">in</span> <span class="id" title="var">Hval</span>...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> <span class="id" title="var">t'</span>)...<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">destruct</span> <span class="id" title="var">IHHT</span> <span class="id" title="keyword">as</span> [<span class="id" title="var">Hval</span> | [<span class="id" title="var">t'</span> <span class="id" title="var">Hstep</span>]]...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.canonical_forms_nat"><span class="id" title="lemma">canonical_forms_nat</span></a> <span class="id" title="tactic">in</span> <span class="id" title="var">Hval</span>...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;× <span class="id" title="tactic">destruct</span> <span class="id" title="var">Hval</span>...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_zero"><span class="id" title="constructor">tm_zero</span></a>...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> <span class="id" title="var">t</span>...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_pred"><span class="id" title="constructor">tm_pred</span></a> <span class="id" title="var">t'</span>)...<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">destruct</span> <span class="id" title="var">IHHT</span> <span class="id" title="keyword">as</span> [<span class="id" title="var">Hval</span> | [<span class="id" title="var">t'</span> <span class="id" title="var">Hstep</span>]]...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.canonical_forms_nat"><span class="id" title="lemma">canonical_forms_nat</span></a> <span class="id" title="tactic">in</span> <span class="id" title="var">Hval</span>...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;× <span class="id" title="tactic">destruct</span> <span class="id" title="var">Hval</span>...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_true"><span class="id" title="constructor">tm_true</span></a>...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_false"><span class="id" title="constructor">tm_false</span></a>...<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_iszero"><span class="id" title="constructor">tm_iszero</span></a> <span class="id" title="var">t'</span>)...<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Theorem</span> <a id="TypedArithExpr.progress" class="idref" href="#TypedArithExpr.progress"><span class="id" title="lemma">progress</span></a> : <span class="id" title="keyword">∀</span> <a id="t:80" class="idref" href="#t:80"><span class="id" title="binder">t</span></a> <a id="T:81" class="idref" href="#T:81"><span class="id" title="binder">T</span></a>,<br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#dcf3e6e33011c7bf8a18c3b7a46726b0"><span class="id" title="notation">&lt;{</span></a><a class="idref" href="TAPL.ArithExpr.html#t:80"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#3e9844b2236e1015bc405e9af5b3de26"><span class="id" title="notation">\</span></a><a class="idref" href="TAPL.ArithExpr.html#3e9844b2236e1015bc405e9af5b3de26"><span class="id" title="notation">in</span></a> <a class="idref" href="TAPL.ArithExpr.html#T:81"><span class="id" title="variable">T</span></a><a class="idref" href="TAPL.ArithExpr.html#dcf3e6e33011c7bf8a18c3b7a46726b0"><span class="id" title="notation">}&gt;</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#::type_scope:x_'-&gt;'_x"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.value"><span class="id" title="inductive">value</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:80"><span class="id" title="variable">t</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#f031fe1957c4a4a8e217aa46af2b4e25"><span class="id" title="notation">∨</span></a> <a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#a883bdd010993579f99d60b3775bcf54"><span class="id" title="notation">∃</span></a> <a id="t':82" class="idref" href="#t':82"><span class="id" title="binder">t'</span></a><a class="idref" href="http://rocq-prover.org/doc/V9.1.0/stdlib//Corelib.Init.Logic.html#a883bdd010993579f99d60b3775bcf54"><span class="id" title="notation">,</span></a> <a class="idref" href="TAPL.ArithExpr.html#t:80"><span class="id" title="variable">t</span></a> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.::type_scope:x_'--&gt;'_x"><span class="id" title="notation">--&gt;</span></a> <a class="idref" href="TAPL.ArithExpr.html#t':82"><span class="id" title="variable">t'</span></a>.<br/>
+<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">t</span> <span class="id" title="var">T</span> <span class="id" title="var">HT</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="tactic">induction</span> <span class="id" title="var">HT</span>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">left</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.v_bv"><span class="id" title="constructor">v_bv</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.bv_true"><span class="id" title="constructor">bv_true</span></a>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">left</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.v_bv"><span class="id" title="constructor">v_bv</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.bv_false"><span class="id" title="constructor">bv_false</span></a>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">right</span>. <span class="id" title="tactic">destruct</span> <span class="id" title="var">IHHT1</span> <span class="id" title="keyword">as</span> [<span class="id" title="var">Hval</span> | [<span class="id" title="var">t1'</span> <span class="id" title="var">Hstep</span>]].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.canonical_forms_bool"><span class="id" title="lemma">canonical_forms_bool</span></a> <span class="id" title="tactic">in</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;× <span class="id" title="tactic">destruct</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- <span class="id" title="tactic">∃</span> <span class="id" title="var">t2</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.E_IfTrue"><span class="id" title="constructor">E_IfTrue</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- <span class="id" title="tactic">∃</span> <span class="id" title="var">t3</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.E_IfFalse"><span class="id" title="constructor">E_IfFalse</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;× <span class="id" title="tactic">exact</span> <span class="id" title="var">HT1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">∃</span> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_if"><span class="id" title="constructor">tm_if</span></a> <span class="id" title="var">t1'</span> <span class="id" title="var">t2</span> <span class="id" title="var">t3</span>). <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.E_If"><span class="id" title="constructor">E_If</span></a>. <span class="id" title="tactic">exact</span> <span class="id" title="var">Hstep</span>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">left</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.v_nv"><span class="id" title="constructor">v_nv</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nv_zero"><span class="id" title="constructor">nv_zero</span></a>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">destruct</span> <span class="id" title="var">IHHT</span> <span class="id" title="keyword">as</span> [<span class="id" title="var">Hval</span> | [<span class="id" title="var">t'</span> <span class="id" title="var">Hstep</span>]].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.canonical_forms_nat"><span class="id" title="lemma">canonical_forms_nat</span></a> <span class="id" title="tactic">in</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;× <span class="id" title="tactic">destruct</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- <span class="id" title="tactic">left</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.v_nv"><span class="id" title="constructor">v_nv</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nv_succ"><span class="id" title="constructor">nv_succ</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nv_zero"><span class="id" title="constructor">nv_zero</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- <span class="id" title="tactic">left</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.v_nv"><span class="id" title="constructor">v_nv</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nv_succ"><span class="id" title="constructor">nv_succ</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.nv_succ"><span class="id" title="constructor">nv_succ</span></a>. <span class="id" title="tactic">exact</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;× <span class="id" title="tactic">exact</span> <span class="id" title="var">HT</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_succ"><span class="id" title="constructor">tm_succ</span></a> <span class="id" title="var">t'</span>). <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.E_Succ"><span class="id" title="constructor">E_Succ</span></a>. <span class="id" title="tactic">exact</span> <span class="id" title="var">Hstep</span>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">destruct</span> <span class="id" title="var">IHHT</span> <span class="id" title="keyword">as</span> [<span class="id" title="var">Hval</span> | [<span class="id" title="var">t'</span> <span class="id" title="var">Hstep</span>]].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.canonical_forms_nat"><span class="id" title="lemma">canonical_forms_nat</span></a> <span class="id" title="tactic">in</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;× <span class="id" title="tactic">destruct</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_zero"><span class="id" title="constructor">tm_zero</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.E_PredZero"><span class="id" title="constructor">E_PredZero</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> <span class="id" title="var">t</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.E_PredSucc"><span class="id" title="constructor">E_PredSucc</span></a>. <span class="id" title="tactic">exact</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;× <span class="id" title="tactic">exact</span> <span class="id" title="var">HT</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_pred"><span class="id" title="constructor">tm_pred</span></a> <span class="id" title="var">t'</span>). <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.E_Pred"><span class="id" title="constructor">E_Pred</span></a>. <span class="id" title="tactic">exact</span> <span class="id" title="var">Hstep</span>.<br/>
+&nbsp;&nbsp;- <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">destruct</span> <span class="id" title="var">IHHT</span> <span class="id" title="keyword">as</span> [<span class="id" title="var">Hval</span> | [<span class="id" title="var">t'</span> <span class="id" title="var">Hstep</span>]].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.canonical_forms_nat"><span class="id" title="lemma">canonical_forms_nat</span></a> <span class="id" title="tactic">in</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;× <span class="id" title="tactic">destruct</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_true"><span class="id" title="constructor">tm_true</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.E_IszeroZero"><span class="id" title="constructor">E_IszeroZero</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-- <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_false"><span class="id" title="constructor">tm_false</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.E_IszeroSucc"><span class="id" title="constructor">E_IszeroSucc</span></a>. <span class="id" title="tactic">exact</span> <span class="id" title="var">Hval</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;× <span class="id" title="tactic">exact</span> <span class="id" title="var">HT</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id" title="tactic">right</span>. <span class="id" title="tactic">∃</span> (<a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.tm_iszero"><span class="id" title="constructor">tm_iszero</span></a> <span class="id" title="var">t'</span>). <span class="id" title="tactic">apply</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr.E_Iszero"><span class="id" title="constructor">E_Iszero</span></a>. <span class="id" title="tactic">exact</span> <span class="id" title="var">Hstep</span>.<br/>
+<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="TAPL.ArithExpr.html#TypedArithExpr"><span class="id" title="module">TypedArithExpr</span></a>.<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://rocq-prover.org/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>
